@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   user-service:
-    build:
-      context: ./user-service
-      dockerfile: Dockerfile
+    image: angeloalcaraz/user-service:latest
     container_name: user-service
     ports:
       - "3000:3000"
