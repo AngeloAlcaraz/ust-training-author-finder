@@ -6,10 +6,10 @@ import { UsersModule } from './modules/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(
-      `${process.env.MONGODB_URI}/${process.env.MONGODB_DB}`,
-    ),
+    MongooseModule.forRoot(process.env.MONGODB_URI!, {
+      dbName: process.env.MONGODB_DB,
+    }),
     UsersModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
