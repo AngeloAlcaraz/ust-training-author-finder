@@ -14,7 +14,6 @@ services:
       - MONGODB_URI=mongodb://mongo:27017
       - MONGODB_DB=users_db
       - PORT=3000
-      - JWT_SECRET=mypassword
 
   mongo:
     image: mongo:6.0
