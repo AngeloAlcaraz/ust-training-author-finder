@@ -4,16 +4,19 @@ import {
   IsOptional,
   IsNumber,
   IsDateString,
+  IsNotEmpty,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateFavoriteDto {
   @ApiProperty({ example: 'OL18319A' })
   @IsString()
+  @IsNotEmpty({ message: 'authorId is required' })
   authorId: string;
 
   @ApiProperty({ example: 'Mark Twain' })
   @IsString()
+  @IsNotEmpty({ message: 'name is required' })
   name: string;
 
   @ApiPropertyOptional({ example: ['Samuel Langhorne Clemens', 'S.L. Clemens'] })
@@ -23,7 +26,7 @@ export class CreateFavoriteDto {
 
   @ApiPropertyOptional({ example: '1835-11-30' })
   @IsString()
-  @IsOptional()
+  @IsNotEmpty({ message: 'birthDate is required' })
   birthDate?: string;
 
   @ApiPropertyOptional({ example: '1910-04-21' })
@@ -58,9 +61,11 @@ export class CreateFavoriteDto {
 
   @ApiProperty({ example: 'user_123' })
   @IsString()
+  @IsNotEmpty({ message: 'addedBy is required' })
   addedBy: string;
 
   @ApiProperty({ example: '2025-06-15T12:34:56.000Z' })
   @IsDateString()
+  @IsNotEmpty({ message: 'addedAt is required' })
   addedAt: string;
 }
