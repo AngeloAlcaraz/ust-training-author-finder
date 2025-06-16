@@ -8,16 +8,24 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../services/user.service';
 import { CreateUserDto } from '../dtos/create-user.dto';
-import { CheckEmailDto } from 'src/dtos/check-email.dto';
-import { ApiQuery } from '@nestjs/swagger';
+import { CheckEmailDto } from '../dtos/check-email.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { plainToInstance } from 'class-transformer';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('health')
+  @ApiOperation({ summary: 'Health check for the users service' })
+  @ApiResponse({ status: 200, description: 'Service is healthy' })
   healthCheck() {
     return {
       success: true,
@@ -27,6 +35,12 @@ export class UsersController {
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({
+    status: 201,
+    description: 'User created successfully',
+    type: UserResponseDto,
+  })
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     const sanitizedUser = plainToInstance(UserResponseDto, user, {
@@ -41,12 +55,24 @@ export class UsersController {
   }
 
   @Get('email')
+  @ApiOperation({ summary: 'Check if a user exists by email' })
   @ApiQuery({
     name: 'email',
     type: String,
     required: true,
     example: 'john@example.com',
     description: 'Email address to check',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Email existence check result',
+    schema: {
+      example: {
+        success: true,
+        message: 'User exists',
+        data: true,
+      },
+    },
   })
   async getByEmail(
     @Query(new ValidationPipe({ transform: true })) query: CheckEmailDto,
