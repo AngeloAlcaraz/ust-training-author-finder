@@ -40,7 +40,7 @@ export class UsersController {
     };
   }
 
-  @Get('getByEmail')
+  @Get('email')
   @ApiQuery({
     name: 'email',
     type: String,
