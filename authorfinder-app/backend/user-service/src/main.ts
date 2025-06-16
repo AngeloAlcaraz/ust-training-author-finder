@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 
-async function bootstrap() {  
+async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api/v1');
@@ -14,8 +14,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
       transform: true,
       exceptionFactory: (errors) => {
-        const messages = errors.map(err => 
-          err.constraints ? Object.values(err.constraints).join(', ') : ''
+        const messages = errors.map((err) =>
+          err.constraints ? Object.values(err.constraints).join(', ') : '',
         );
         return new BadRequestException(messages);
       },

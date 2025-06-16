@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersService } from '../services/user.service';
 import { UsersController } from '../controllers/user.controller';
 import { User, UserSchema } from '../schemas/user.schema';
-import { LoggingMiddleware } from '../common/middleware/logging-middleware'
+import { LoggingMiddleware } from '../common/middleware/logging-middleware';
 
 @Module({
   imports: [

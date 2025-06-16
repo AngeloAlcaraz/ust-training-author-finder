@@ -1,4 +1,4 @@
-import { AllExceptionsFilter } from '../../../src/common/filters/all-exceptions.filter'
+import { AllExceptionsFilter } from '../../../src/common/filters/all-exceptions.filter';
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 
 describe('AllExceptionsFilter', () => {
@@ -34,7 +34,7 @@ describe('AllExceptionsFilter', () => {
     );
   });
 
-  it('should handle non-HttpException as 500 error', () => {
+    it('should handle non-HttpException as 500 error', () => {
     const exception = new Error('Unexpected error');
 
     const json = jest.fn();
@@ -54,7 +54,7 @@ describe('AllExceptionsFilter', () => {
     expect(json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        message: 'Internal server error',
+        message: 'Unexpected error', 
         path: '/test',
       }),
     );

@@ -12,4 +12,4 @@ import { UsersModule } from './modules/user.module';
     UsersModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

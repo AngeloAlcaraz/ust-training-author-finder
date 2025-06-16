@@ -36,11 +36,10 @@ describe('UsersController', () => {
   describe('create', () => {
     it('should call usersService.create and return sanitized user', async () => {
       const createUserDto: CreateUserDto = {
-        // completa con las propiedades requeridas para CreateUserDto
         email: 'test@example.com',
         name: 'Test User',
         password: 'password123',
-        gender: ''
+        gender: '',
       };
 
       const userEntity = {
@@ -48,7 +47,6 @@ describe('UsersController', () => {
         email: 'test@example.com',
         name: 'Test User',
         password: 'hashedpassword',
-        // otras propiedades que tenga el user
       };
 
       usersService.create?.mockResolvedValue(userEntity);
@@ -63,7 +61,6 @@ describe('UsersController', () => {
         email: userEntity.email,
         name: userEntity.name,
       });
-      // no debe exponer password ni otros datos internos
       expect(result.data).not.toHaveProperty('password');
     });
   });
@@ -71,7 +68,10 @@ describe('UsersController', () => {
   describe('getByEmail', () => {
     it('should return true if user exists', async () => {
       const query: CheckEmailDto = { email: 'exists@example.com' };
-      usersService.findByEmail?.mockResolvedValue({ id: '1', email: query.email });
+      usersService.findByEmail?.mockResolvedValue({
+        id: '1',
+        email: query.email,
+      });
 
       const result = await usersController.getByEmail(query);
 

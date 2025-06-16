@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from 'express';
 import { LoggingMiddleware } from '../../../src/common/middleware/logging-middleware';
 
 describe('LoggingMiddleware', () => {
@@ -6,7 +7,9 @@ describe('LoggingMiddleware', () => {
 
   beforeEach(() => {
     middleware = new LoggingMiddleware();
-    mockLoggerLog = jest.spyOn(middleware['logger'], 'log').mockImplementation(() => {});
+    mockLoggerLog = jest
+      .spyOn(middleware['logger'], 'log')
+      .mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -14,20 +17,22 @@ describe('LoggingMiddleware', () => {
   });
 
   it('should call next()', () => {
-    const req: any = {
+    const req = {
       method: 'GET',
       originalUrl: '/test',
       ip: '127.0.0.1',
       body: {},
       get: jest.fn().mockReturnValue('jest-user-agent'),
-    };
-    const res: any = {
-      on: jest.fn((event, cb) => {
+    } as unknown as Request;
+
+    const res = {
+      on: jest.fn((event: string, cb: () => void) => {
         if (event === 'finish') cb();
       }),
       statusCode: 200,
-    };
-    const next = jest.fn();
+    } as unknown as Response & { on: (event: string, cb: () => void) => void };
+
+    const next: NextFunction = jest.fn();
 
     middleware.use(req, res, next);
 
@@ -45,26 +50,27 @@ describe('LoggingMiddleware', () => {
   });
 
   it('should mask password in logged body', () => {
-    const req: any = {
+    const req = {
       method: 'POST',
       originalUrl: '/login',
       ip: '192.168.1.1',
       body: { username: 'user', password: 'secret' },
       get: jest.fn().mockReturnValue('test-agent'),
-    };
-    const res: any = {
-      on: jest.fn((event, cb) => {
+    } as unknown as Request;
+
+    const res = {
+      on: jest.fn((event: string, cb: () => void) => {
         if (event === 'finish') cb();
       }),
       statusCode: 201,
-    };
-    const next = jest.fn();
+    } as unknown as Response & { on: (event: string, cb: () => void) => void };
+
+    const next: NextFunction = jest.fn();
 
     middleware.use(req, res, next);
 
     expect(next).toHaveBeenCalled();
 
-    // Check that password is masked in the log
     expect(mockLoggerLog).toHaveBeenCalledWith(
       expect.stringContaining('"password":"******"'),
     );
