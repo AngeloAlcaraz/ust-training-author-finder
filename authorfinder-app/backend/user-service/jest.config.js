@@ -11,4 +11,10 @@ module.exports = {
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "src/main.ts",
+    "src/app.module.ts",
+    "src/modules/"
+  ],
 };
