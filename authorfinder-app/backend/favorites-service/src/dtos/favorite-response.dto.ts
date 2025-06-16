@@ -1,42 +1,56 @@
 import { Expose } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FavoriteResponseDto {
+  @ApiProperty({ example: 'fav123' })
   @Expose()
-  _id: string;
+  id: string;
 
+  @ApiProperty({ example: 'OL18319A' })
   @Expose()
   authorId: string;
 
+  @ApiProperty({ example: 'Mark Twain' })
   @Expose()
   name: string;
 
+  @ApiPropertyOptional({ example: ['Samuel Langhorne Clemens', 'S.L. Clemens'] })
   @Expose()
-  alternateNames: string[];
+  alternateNames?: string[];
 
+  @ApiPropertyOptional({ example: '1835-11-30' })
   @Expose()
-  birthDate: string;
+  birthDate?: string;
 
+  @ApiPropertyOptional({ example: '1910-04-21' })
   @Expose()
-  deathDate: string;
+  deathDate?: string;
 
+  @ApiPropertyOptional({ example: 'The Adventures of Tom Sawyer' })
   @Expose()
-  topWork: string;
+  topWork?: string;
 
+  @ApiPropertyOptional({ example: ['American literature', 'Humorists, American'] })
   @Expose()
-  topSubjects: string[];
+  topSubjects?: string[];
 
+  @ApiPropertyOptional({ example: 42 })
   @Expose()
-  workCount: number;
+  workCount?: number;
 
+  @ApiPropertyOptional({ example: 4.5 })
   @Expose()
-  ratingsAverage: number;
+  ratingsAverage?: number;
 
+  @ApiPropertyOptional({ example: 1234 })
   @Expose()
-  ratingsCount: number;
+  ratingsCount?: number;
 
+  @ApiProperty({ example: 'user_123' })
   @Expose()
   addedBy: string;
 
+  @ApiProperty({ example: '2025-06-15T12:34:56.000Z' })
   @Expose()
   addedAt: string;
 }

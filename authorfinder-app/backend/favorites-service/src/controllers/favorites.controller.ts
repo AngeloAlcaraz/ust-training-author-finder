@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   Delete,
-  Query,
 } from '@nestjs/common';
 import { FavoritesService } from '../services/favorites.service';
 import { CreateFavoriteDto } from '../dtos/create-favorite.dto';
@@ -15,13 +14,12 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 
 @ApiTags('Favorites')
 @Controller('favorites')
 export class FavoritesController {
-  constructor(private readonly favoritesService: FavoritesService) {}
+  constructor(private readonly favoritesService: FavoritesService) { }
 
   @Get('health')
   @ApiOperation({ summary: 'Health check for the favorites service' })
@@ -54,20 +52,14 @@ export class FavoritesController {
     };
   }
 
-  @Get('user/:id')
+  @Get('user/:userId')
   @ApiOperation({ summary: 'Get favorites by user ID' })
-  @ApiQuery({
-    name: 'userId',
-    type: String,
-    required: true,
-    description: 'User ID to retrieve favorites for',
-  })
   @ApiResponse({
     status: 200,
     description: 'Favorites retrieved successfully',
     type: [FavoriteResponseDto],
   })
-  async findByUser(@Query('userId') userId: string) {
+  async findByUser(@Param('userId') userId: string) {
     const favorites = await this.favoritesService.findByUserId(userId);
     const transformed = plainToInstance(FavoriteResponseDto, favorites, {
       excludeExtraneousValues: true,
@@ -81,6 +73,7 @@ export class FavoritesController {
       data: transformed,
     };
   }
+
 
   @Get(':id')
   @ApiOperation({ summary: 'Get favorite details by ID' })

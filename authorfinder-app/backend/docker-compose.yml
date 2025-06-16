@@ -13,6 +13,18 @@ services:
       - MONGODB_DB=users_db
       - PORT=3000
 
+  favorites-service:
+    image: angeloalcaraz/favorites-service:latest
+    container_name: favorites-service
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DB=favorites_db
+      - PORT=3001
+
   mongo:
     image: mongo:6.0
     container_name: mongo
