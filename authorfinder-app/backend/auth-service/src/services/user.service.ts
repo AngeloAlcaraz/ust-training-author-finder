@@ -1,34 +1,40 @@
 import { Injectable } from "@nestjs/common";
+import { CustomAxiosInstance } from "src/api/CustomAxiosInstance";
 
 @Injectable()
 export class UserService {
-    // This service can be used to manage user-related operations
-    // such as creating, updating, deleting users, etc.
-    
-    // Example method to get user by ID
-    async getUserById(userId: string): Promise<any> {
-        // Logic to retrieve user from the database
-        return { id: userId, name: "John Doe" }; // Placeholder return value
-    }
-    
-    // Example method to create a new user
-    async createUser(userData: any): Promise<any> {
-        // Logic to create a new user in the database
-        return { id: "newUserId", ...userData }; // Placeholder return value
+    private api: CustomAxiosInstance;
+
+    constructor() {
+        this.api = new CustomAxiosInstance("http://localhost:4001/api/v1");
     }
 
-    async update(id: string, updateData: any): Promise<any> {
-        // Logic to update user data in the database
-        return { id, ...updateData }; // Placeholder return value
+    setTokens(accessToken: string, refreshToken: string) {
+        this.api.setAccessToken(accessToken);
+        this.api.setRefreshToken(refreshToken);
+    }
+    
+    async createUser(userData: any): Promise<any> {
+        const response = await this.api.instance.post("/users", userData);
+        return response.data.data;
     }
 
     async findByEmail(email: string): Promise<any> {
-        // Logic to find a user by email in the database
-        return null; // Placeholder return value, should return user object if found
+        const response = await this.api.instance.get(`/users/email?email=${email}`);
+        return response.data.data; //Axios response structure includes a 'data' field with the original response from the API
     }
 
-    async create(createUserDto: any): Promise<any> {
-        // Logic to create a new user in the database
-        return { id: "newUserId", ...createUserDto }; // Placeholder return value
+    async update(userId: string, updateData: any): Promise<any> {
+        // const response = await this.api.instance.put(`/users/${userId}`, updateData);
+        // return response.data;
+        
+        return { 
+            id: 'newUserId', 
+            name: 'newUsername',
+            email: 'test@example.com',
+            gender: 'male',
+            refreshToken: 'newRefreshToken',
+
+        }; // Mock response for testing
     }
 }

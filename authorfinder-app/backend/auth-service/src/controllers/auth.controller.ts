@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { AuthUser } from "src/decorator/decorator.auth_user";
 import { AuthDto } from "src/dtos/auth.dto";
 import { CreateUserDto } from "src/dtos/create-user.dto";
+import { AccessTokenGuard } from "src/guards/guard.access_token";
+import { RefreshTokenGuard } from "src/guards/guard.refresh_token";
 import { AuthService } from "src/services/auth.service";
 
 @ApiTags("Authentication")
@@ -28,15 +30,17 @@ export class AuthController {
         return { message: "User successfully logged in", data: user };
     }
 
+    @UseGuards(AccessTokenGuard)
     @Get("logout")
     @ApiOperation({ summary: "User Logout" })
     @ApiOkResponse({ description: "User successfully logged out" })
     @ApiBadRequestResponse({ description: "Logout failed" })
     async logout(@AuthUser('sub') sub: string): Promise<{ message: string }> {
-        await this.authService.logout(sub); // Assuming the user ID is managed in the service
+        await this.authService.logout(sub);
         return { message: "User successfully logged out" };
     }
 
+    @UseGuards(RefreshTokenGuard)
     @Get("refresh")
     @ApiOperation({ summary: "Refresh User Session" })
     @ApiOkResponse({ description: "User session successfully refreshed" })

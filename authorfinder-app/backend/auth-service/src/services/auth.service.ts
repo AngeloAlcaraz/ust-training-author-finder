@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "argon2";
 import { Tokens } from "src/types/tokens.type";
 import { CreateUserDto } from "src/dtos/create-user.dto";
-import { LoginResponse } from "src/interfaces/res.login.interface";
+import { ILoginResponse } from "src/interfaces/login-response.interface";
 import { AuthDto } from "src/dtos/auth.dto";
 
 @Injectable()
@@ -18,12 +18,13 @@ export class AuthService {
         return await argon2.hash(password);
     }
 
-    private async getTokens(userId: string, username: string): Promise<Tokens> {
+    private async getTokens(userId: string, username: string, email: string): Promise<Tokens> {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(
                 {
                     sub: userId,
                     username,
+                    email,
                 },
                 {
                     secret: process.env.JWT_ACCESS_SECRET || '',
@@ -34,6 +35,7 @@ export class AuthService {
                 {
                     sub: userId,
                     username,
+                    email,
                 },
                 {
                     secret: process.env.JWT_REFRESH_SECRET || '',
@@ -53,60 +55,61 @@ export class AuthService {
         await this.userService.update(userId, {refreshToken: hashedRefreshToken});
     }
 
-    async signUp(createUserDto: CreateUserDto): Promise<LoginResponse> {
+    async signUp(createUserDto: CreateUserDto): Promise<ILoginResponse> {
         const userExists = await this.userService.findByEmail(createUserDto.email);
         if (userExists) {
             throw new BadRequestException("User already exists");
         }
 
         const hashedPassword = await this.hashPassword(createUserDto.password);
-        const newUser = await this.userService.create({
+        const newUser = await this.userService.createUser({
             ...createUserDto,
             password: hashedPassword,
         });
 
-        const tokens = await this.getTokens(newUser.id, newUser.username);
-        await this.updateRefreshToken(newUser.id, tokens.refreshToken);
+        //const tokens = await this.getTokens(newUser.id, newUser.username);
+        //await this.updateRefreshToken(newUser.id, tokens.refreshToken);
 
         return {
-            ...tokens,
+            //...tokens,
             id: newUser.id,
-            username: newUser.username,
+            name: newUser.name,
             email: newUser.email,
-            firstName: newUser.firstName,
-            lastName: newUser.lastName,
+            gender: newUser.gender,
+            accessToken: '', // Placeholder, remove when user service is ready
+            refreshToken: '', // Placeholder, remove when user service is ready
         };
     }
 
-    async signIn(data: AuthDto): Promise<LoginResponse> {
-        const user = await this.userService.findByEmail(data.email);
-        if (!user || !(await argon2.verify(user.password, data.password))) {
+    async signIn(data: AuthDto): Promise<ILoginResponse> {
+        //const user = await this.userService.findByEmail(data.email);
+        //TODO: REMOVE COMMENT, WAITING FOR USER SERVICE TO BE READY
+        /*if (!user || !(await argon2.verify(user.password, data.password))) {
             throw new BadRequestException("Invalid credentials");
-        }
+        }*/
+        var user: any = { id:'', username:'string'}; // Temporary fix for testing, remove when user service is ready
+        user.id = '6851aecd1f9571b99dc1c456'; // Temporary fix for testing, remove when user service is ready
+        user.username = 'John Doe'; // Temporary fix for testing, remove when user service is ready
 
-        const tokens = await this.getTokens(user.id, user.username);
+        const tokens = await this.getTokens(user.id, user.username, user.email);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
 
         return {
             ...tokens,
             id: user.id,
-            username: user.username,
+            name: user.name,
             email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            gender: user.gender
         };
     }
 
     async logout(userId: string): Promise<void> {
-        const user = await this.userService.findByEmail(userId);
-        if (!user) {
-            throw new BadRequestException("User not found");
-        }
-
-        await this.userService.update(user.id, { refreshToken: null });
+        await this.userService.update(userId, { refreshToken: null });
     }
 
-    async refreshTokens(userId: string, refreshToken: string): Promise<LoginResponse> {
+    async refreshTokens(userId: string, refreshToken: string): Promise<ILoginResponse> {
+
+        // TODO: It's necessary to create a user service method to find user by ID
         const user = await this.userService.findByEmail(userId);
         if (!user || !user.refreshToken) {
             throw new BadRequestException("User not found or no refresh token");
@@ -117,16 +120,15 @@ export class AuthService {
             throw new BadRequestException("Invalid refresh token");
         }
 
-        const tokens = await this.getTokens(user.id, user.username);
+        const tokens = await this.getTokens(user.id, user.username, user.email);
         await this.updateRefreshToken(user.id, tokens.refreshToken);
 
         return {
             ...tokens,
             id: user.id,
-            username: user.username,
+            name: user.name,
             email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            gender: user.gender,
         }
     }
 }

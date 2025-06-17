@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
-import Joi from "joi";
+import * as Joi from "joi";
 import { AuthController } from "src/controllers/auth.controller";
 import { AuthService } from "src/services/auth.service";
 import { UserService } from "src/services/user.service";
