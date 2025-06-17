@@ -6,8 +6,7 @@ import {
   Query,
   ValidationPipe,
 } from '@nestjs/common';
-import { UsersService } from '../services/user.service';
-import { CreateUserDto } from '../dtos/create-user.dto';
+import { UserService } from '../services/user.service';
 import { CheckEmailDto } from '../dtos/check-email.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { plainToInstance } from 'class-transformer';
@@ -17,11 +16,12 @@ import {
   ApiResponse,
   ApiQuery,
 } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/dtos/create-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UsersController {  
+  constructor(private readonly usersService: UserService) {}
 
   @Get('health')
   @ApiOperation({ summary: 'Health check for the users service' })
