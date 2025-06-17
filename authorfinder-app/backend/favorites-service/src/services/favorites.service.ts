@@ -1,42 +1,114 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Favorite } from '../schemas/favorite.schema';
-import { CreateFavoriteDto } from '../dtos/create-favorite.dto';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+  GetCommand,
+  DeleteCommand,
+} from '@aws-sdk/lib-dynamodb';
 
 @Injectable()
 export class FavoritesService {
-  constructor(
-    @InjectModel(Favorite.name) private readonly favoriteModel: Model<Favorite>,
-  ) { }
+  private readonly ddbClient: DynamoDBClient;
+  private readonly ddbDocClient: DynamoDBDocumentClient;
+  private readonly tableName = 'Favorites';
 
-  async create(createFavoriteDto: CreateFavoriteDto): Promise<Favorite> {
-    try {
-      const createdFavorite = new this.favoriteModel(createFavoriteDto);
-      return await createdFavorite.save();
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new ConflictException('This author is already in your favorites.');
-      }
-      throw error;
+  constructor() {
+    this.ddbClient = new DynamoDBClient({});
+    this.ddbDocClient = DynamoDBDocumentClient.from(this.ddbClient);
+  }
+
+  async create(createFavoriteDto: any): Promise<any> {
+    const key = {
+      addedBy: createFavoriteDto.addedBy,
+      authorId: createFavoriteDto.authorId,
+    };
+
+    const existing = await this.ddbDocClient.send(
+      new GetCommand({
+        TableName: this.tableName,
+        Key: key,
+      }),
+    );
+
+    if (existing.Item) {
+      throw new ConflictException('This author is already in your favorites.');
     }
+
+    await this.ddbDocClient.send(
+      new PutCommand({
+        TableName: this.tableName,
+        Item: createFavoriteDto,
+      }),
+    );
+
+    return createFavoriteDto;
   }
 
-  async findByUserId(userId: string): Promise<Favorite[]> {
-    return this.favoriteModel.find({ addedBy: userId }).exec();
+  async findByUserId(userId: string): Promise<any[]> {
+    const result = await this.ddbDocClient.send(
+      new QueryCommand({
+        TableName: this.tableName,
+        KeyConditionExpression: 'addedBy = :userId',
+        ExpressionAttributeValues: {
+          ':userId': userId,
+        },
+      }),
+    );
+
+    return result.Items || [];
   }
 
-  async findById(id: string): Promise<Favorite> {
-    const favorite = await this.favoriteModel.findById(id).exec();
-    if (!favorite) {
+  async findByAuthorId(authorId: string): Promise<any[]> {
+    const result = await this.ddbDocClient.send(
+      new QueryCommand({
+        TableName: this.tableName,
+        IndexName: 'authorId-addedAt-index',
+        KeyConditionExpression: 'authorId = :authorId',
+        ExpressionAttributeValues: {
+          ':authorId': authorId,
+        },
+        ScanIndexForward: false,
+      }),
+    );
+
+    return result.Items || [];
+  }
+
+  async findById(addedBy: string, authorId: string): Promise<any> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        addedBy,
+        authorId,
+      },
+    };
+
+    const result = await this.ddbDocClient.send(new GetCommand(params));
+    if (!result.Item) {
       throw new NotFoundException('Favorite not found.');
     }
-    return favorite;
+
+    return result.Item;
   }
 
-  async deleteById(id: string): Promise<void> {
-    const result = await this.favoriteModel.findByIdAndDelete(id).exec();
-    if (!result) {
+  async deleteById(addedBy: string, authorId: string): Promise<void> {
+    const params = {
+      TableName: this.tableName,
+      Key: {
+        addedBy,
+        authorId,
+      },
+      ReturnValues: 'ALL_OLD' as const,
+    };
+
+    const result = await this.ddbDocClient.send(new DeleteCommand(params));
+    if (!result.Attributes) {
       throw new NotFoundException('Favorite not found.');
     }
   }

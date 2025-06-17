@@ -1,151 +1,119 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { FavoritesService } from '../../src/services/favorites.service';
-import { getModelToken } from '@nestjs/mongoose';
-import { Favorite } from '../../src/schemas/favorite.schema';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { FavoritesService } from '../../src/services/favorites.service';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
-interface ExecMock<T> {
-  exec: () => Promise<T>;
-}
-
-interface MockModel<T> {
-  find: jest.Mock<ExecMock<T[]>, [any]>;
-  findById: jest.Mock<ExecMock<T | null>, [string]>;
-  findByIdAndDelete: jest.Mock<ExecMock<T | null>, [string]>;
-  new (dto?: any): T & { save: jest.Mock<Promise<T>, []> };
-}
+jest.mock('@aws-sdk/client-dynamodb');
+jest.mock('@aws-sdk/lib-dynamodb');
 
 describe('FavoritesService', () => {
   let service: FavoritesService;
-  let mockModel: MockModel<typeof mockFavorite>;
+  let sendMock: jest.Mock;
 
-  const mockFavorite = {
-    _id: 'mock-id',
-    authorId: 'OL12345A',
-    name: 'Jane Austen',
-    addedBy: 'user123',
-  };
+  beforeEach(() => {
+    sendMock = jest.fn();
 
-  const saveMock = jest.fn().mockResolvedValue(mockFavorite);
+    (DynamoDBClient as jest.Mock).mockImplementation(() => ({}));
+    (DynamoDBDocumentClient.from as jest.Mock).mockReturnValue({
+      send: sendMock,
+    });
 
-  beforeEach(async () => {
-    const modelMock = {
-      find: jest.fn<ExecMock<typeof mockFavorite[]>, [any]>(),
-      findById: jest.fn<ExecMock<typeof mockFavorite | null>, [string]>(),
-      findByIdAndDelete: jest.fn<ExecMock<typeof mockFavorite | null>, [string]>(),
-      prototype: {
-        save: saveMock,
-      },
-    };
-
-    const modelConstructorMock = jest.fn().mockImplementation((dto) => ({
-      ...dto,
-      save: saveMock,
-    }));
-
-    Object.assign(modelConstructorMock, modelMock);
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        FavoritesService,
-        {
-          provide: getModelToken(Favorite.name),
-          useValue: modelConstructorMock,
-        },
-      ],
-    }).compile();
-
-    service = module.get<FavoritesService>(FavoritesService);
-    mockModel = module.get(getModelToken(Favorite.name));
+    service = new FavoritesService();
   });
 
   describe('create', () => {
-    it('should create and save a new favorite', async () => {
-      const createDto = {
-        authorId: 'OL12345A',
-        name: 'Jane Austen',
-        addedBy: 'user123',
-      };
+    it('should create a new favorite when it does not exist', async () => {
+      // Simula que no existe el item (GetCommand)
+      sendMock.mockResolvedValueOnce({ Item: undefined });
+      // Simula éxito en creación (PutCommand)
+      sendMock.mockResolvedValueOnce({});
 
-      const result = await service.create(createDto as any);
+      const dto = { addedBy: 'user1', authorId: 'author1', name: 'Mark Twain' };
 
-      expect(mockModel).toHaveBeenCalledWith(createDto);
-      expect(saveMock).toHaveBeenCalled();
-      expect(result).toEqual(mockFavorite);
+      const result = await service.create(dto);
+
+      expect(sendMock).toHaveBeenCalledTimes(2);
+      expect(result).toEqual(dto);
     });
 
     it('should throw ConflictException if favorite already exists', async () => {
-      const createDto = {
-        authorId: 'OL12345A',
-        name: 'Jane Austen',
-        addedBy: 'user123',
-      };
+      sendMock.mockResolvedValueOnce({ Item: { addedBy: 'user1', authorId: 'author1' } });
 
-      const conflictError = { code: 11000 };
-      saveMock.mockRejectedValueOnce(conflictError);
+      const dto = { addedBy: 'user1', authorId: 'author1', name: 'Mark Twain' };
 
-      await expect(service.create(createDto as any)).rejects.toThrow(
-        ConflictException,
-      );
-
-      saveMock.mockResolvedValue(mockFavorite);
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
+      expect(sendMock).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('findByUserId', () => {
-    it('should return all favorites for a user', async () => {
-      const favorites = [mockFavorite];
-      mockModel.find.mockReturnValueOnce({
-        exec: () => Promise.resolve(favorites),
-      });
+    it('should return list of favorites for user', async () => {
+      const items = [{ authorId: 'author1' }, { authorId: 'author2' }];
+      sendMock.mockResolvedValueOnce({ Items: items });
 
-      const result = await service.findByUserId('user123');
+      const result = await service.findByUserId('user1');
 
-      expect(mockModel.find).toHaveBeenCalledWith({ addedBy: 'user123' });
-      expect(result).toEqual(favorites);
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(items);
+    });
+
+    it('should return empty array if none found', async () => {
+      sendMock.mockResolvedValueOnce({ Items: undefined });
+
+      const result = await service.findByUserId('user1');
+
+      expect(result).toEqual([]);
     });
   });
 
   describe('findById', () => {
-    it('should return a favorite by id', async () => {
-      mockModel.findById.mockReturnValueOnce({
-        exec: () => Promise.resolve(mockFavorite),
-      });
+    it('should throw NotFoundException if item not found', async () => {
+      sendMock.mockResolvedValueOnce({ Item: undefined });
 
-      const result = await service.findById('mock-id');
-
-      expect(mockModel.findById).toHaveBeenCalledWith('mock-id');
-      expect(result).toEqual(mockFavorite);
+      await expect(service.findById('user1', 'author1')).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if favorite not found', async () => {
-      mockModel.findById.mockReturnValueOnce({
-        exec: () => Promise.resolve(null),
-      });
+    it('should return item if found', async () => {
+      const item = { addedBy: 'user1', authorId: 'author1' };
+      sendMock.mockResolvedValueOnce({ Item: item });
 
-      await expect(service.findById('nonexistent-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      const result = await service.findById('user1', 'author1');
+
+      expect(result).toEqual(item);
+    });
+  });
+
+  describe('findByAuthorId', () => {
+    it('should return favorites by authorId', async () => {
+      const items = [{ addedBy: 'user1' }, { addedBy: 'user2' }];
+      sendMock.mockResolvedValueOnce({ Items: items });
+
+      const result = await service.findByAuthorId('author1');
+
+      expect(sendMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(items);
+    });
+
+    it('should return empty array if none found', async () => {
+      sendMock.mockResolvedValueOnce({ Items: undefined });
+
+      const result = await service.findByAuthorId('author1');
+
+      expect(result).toEqual([]);
     });
   });
 
   describe('deleteById', () => {
-    it('should delete a favorite by id', async () => {
-      mockModel.findByIdAndDelete.mockReturnValueOnce({
-        exec: () => Promise.resolve(mockFavorite),
-      });
+    it('should throw NotFoundException if no item deleted', async () => {
+      sendMock.mockResolvedValueOnce({ Attributes: undefined });
 
-      await expect(service.deleteById('mock-id')).resolves.not.toThrow();
+      await expect(service.deleteById('user1', 'author1')).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if favorite not found', async () => {
-      mockModel.findByIdAndDelete.mockReturnValueOnce({
-        exec: () => Promise.resolve(null),
-      });
+    it('should delete item if exists', async () => {
+      sendMock.mockResolvedValueOnce({ Attributes: { addedBy: 'user1', authorId: 'author1' } });
 
-      await expect(service.deleteById('nonexistent-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.deleteById('user1', 'author1')).resolves.toBeUndefined();
     });
   });
 });
