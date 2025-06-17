@@ -17,4 +17,9 @@ export class UserResponseDto {
   @ApiProperty()
   @Expose()
   gender: string;
+
+  @ApiProperty()
+  @Expose()
+  password: string;
+  refreshToken: null;
 }

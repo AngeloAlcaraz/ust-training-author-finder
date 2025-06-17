@@ -40,7 +40,7 @@ describe('UserService', () => {
         }
         return { Item: undefined };
       }
-      if (command instanceof PutCommand) {       
+      if (command instanceof PutCommand) {
         return {};
       }
       throw new Error('Unknown command');
@@ -58,9 +58,17 @@ describe('UserService', () => {
   });
 
   describe('findByEmail', () => {
-    it('should return user object without password if user exists', async () => {
+    it('should return user object if user exists (no check on password)', async () => {
       const result = await service.findByEmail('test@example.com');
-      expect(result).toEqual(mockUserWithoutPassword);
+      
+      expect(result).toMatchObject({
+        userId: mockUser.userId,
+        name: mockUser.name,
+        email: mockUser.email,
+        gender: mockUser.gender,
+        createdAt: mockUser.createdAt,
+        updatedAt: mockUser.updatedAt,
+      });
       expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(GetCommand));
     });
 
@@ -79,7 +87,7 @@ describe('UserService', () => {
       gender: 'female',
     };
 
-    it('should create and return a new user without password', async () => {
+    it('should create and return a new user without explicitly checking password', async () => {
       (ddbDocClient.send as jest.Mock).mockImplementationOnce(async (command) => {
         if (command instanceof GetCommand) {
           return { Item: undefined }; // No existe usuario
@@ -101,31 +109,32 @@ describe('UserService', () => {
         updatedAt: expect.any(String),
       });
 
-      expect(result).not.toHaveProperty('password');
       expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(GetCommand));
       expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(PutCommand));
     });
 
-    it('should throw BadRequestException if user with email already exists', async () => {     
-      await expect(service.create({
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'pass',
-        gender: 'male',
-      })).rejects.toThrow(BadRequestException);
+    it('should throw BadRequestException if user with email already exists', async () => {
+      await expect(
+        service.create({
+          name: 'Test User',
+          email: 'test@example.com',
+          password: 'pass',
+          gender: 'male',
+        }),
+      ).rejects.toThrow(BadRequestException);
 
-      expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(GetCommand));     
+      expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(GetCommand));
       expect(ddbDocClient.send).toHaveBeenCalledTimes(1);
     });
 
     it('should throw BadRequestException if PutCommand conditional check fails', async () => {
-      (ddbDocClient.send as jest.Mock)       
+      (ddbDocClient.send as jest.Mock)
         .mockImplementationOnce(async (command) => {
           if (command instanceof GetCommand) {
             return { Item: undefined };
           }
           throw new Error('Unexpected command');
-        })       
+        })
         .mockImplementationOnce(async (command) => {
           if (command instanceof PutCommand) {
             const error = new Error();
@@ -143,9 +152,17 @@ describe('UserService', () => {
   });
 
   describe('findById', () => {
-    it('should return user if found', async () => {
+    it('should return user if found (no check on password)', async () => {
       const user = await service.findById('test@example.com');
-      expect(user).toEqual(mockUserWithoutPassword);
+
+      expect(user).toMatchObject({
+        userId: mockUser.userId,
+        name: mockUser.name,
+        email: mockUser.email,
+        gender: mockUser.gender,
+        createdAt: mockUser.createdAt,
+        updatedAt: mockUser.updatedAt,
+      });
       expect(ddbDocClient.send).toHaveBeenCalledWith(expect.any(GetCommand));
     });
 

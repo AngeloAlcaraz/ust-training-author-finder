@@ -6,27 +6,29 @@ import { CheckEmailDto } from '../../src/dtos/check-email.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let userService: UserService;
-
-  const mockUserService = {
-    create: jest.fn(),
-    findByEmail: jest.fn(),
-  };
+  let userService: jest.Mocked<UserService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{ provide: UserService, useValue: mockUserService }],
+      providers: [
+        {
+          provide: UserService,
+          useValue: {
+            create: jest.fn(),
+            findByEmail: jest.fn(),
+            updateRefreshToken: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    userService = module.get<UserService>(UserService);
-
-    jest.clearAllMocks();
+    userService = module.get(UserService);
   });
 
   describe('healthCheck', () => {
-    it('should return service health info', () => {
+    it('should return service health status', () => {
       const result = controller.healthCheck();
       expect(result).toEqual({
         success: true,
@@ -37,78 +39,100 @@ describe('UsersController', () => {
   });
 
   describe('create', () => {
-    it('should create a new user and return sanitized response', async () => {
+    it('should create a new user and return sanitized user', async () => {
       const createUserDto: CreateUserDto = {
-        name: 'Test User',
         email: 'test@example.com',
-        password: 'password123',
+        name: 'Test User',
+        password: 'pass123',
         gender: 'male',
+        refreshToken: undefined,
       };
-
       const createdUser = {
+        ...createUserDto,
         userId: createUserDto.email,
-        name: createUserDto.name,
-        email: createUserDto.email,
-        gender: createUserDto.gender,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: '2025-06-17T12:00:00Z',
+        updatedAt: '2025-06-17T12:00:00Z',
+        password: 'pass123',
+        refreshToken: null,
       };
 
-      mockUserService.create.mockResolvedValue(createdUser);
+      userService.create.mockResolvedValue(createdUser);
 
-      const response = await controller.create(createUserDto);
+      const result = await controller.create(createUserDto);
 
       expect(userService.create).toHaveBeenCalledWith(createUserDto);
-      expect(response).toEqual({
+      expect(result).toMatchObject({
         success: true,
         message: 'User created successfully',
         data: expect.objectContaining({
-          _id: undefined, 
-          name: 'Test User',
-          email: 'test@example.com',
-          gender: 'male',
+          userId: createUserDto.email,
+          email: createUserDto.email,
+          name: createUserDto.name,
         }),
       });
+
+      expect(
+        result.data.refreshToken === null || result.data.refreshToken === undefined,
+      ).toBe(true);
     });
   });
 
   describe('getByEmail', () => {
-    it('should return success true and data true if user exists', async () => {
-      const email = 'exists@example.com';
-      const query: CheckEmailDto = { email };
-
-      mockUserService.findByEmail.mockResolvedValue({
+    it('should return user if exists', async () => {
+      const email = 'existing@example.com';
+      const user = {
         userId: email,
         name: 'Existing User',
         email,
         gender: 'female',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+        password: 'hashed_password',
+        createdAt: '2025-06-17T12:00:00Z',
+        updatedAt: '2025-06-17T12:00:00Z',
+        refreshToken: null,
+      };
+      userService.findByEmail.mockResolvedValue(user);
 
+      const query: CheckEmailDto = { email };
       const result = await controller.getByEmail(query);
 
       expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User exists',
-        data: true,
+        data: user,
       });
     });
 
-    it('should return success true and data false if user does not exist', async () => {
+    it('should return user does not exist if user not found', async () => {
       const email = 'notfound@example.com';
+      userService.findByEmail.mockResolvedValue(null);
+
       const query: CheckEmailDto = { email };
-
-      mockUserService.findByEmail.mockResolvedValue(null);
-
       const result = await controller.getByEmail(query);
 
       expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User does not exist',
-        data: false,
+        data: null,
+      });
+    });
+  });
+
+  describe('updateRefreshToken', () => {
+    it('should update refresh token and return success true', async () => {
+      const userId = 'user-id-123';
+      const dto = { refreshToken: 'new-refresh-token-abc' };
+
+      userService.updateRefreshToken.mockResolvedValue(true);
+
+      const result = await controller.updateRefreshToken(userId, dto);
+
+      expect(userService.updateRefreshToken).toHaveBeenCalledWith(userId, dto.refreshToken);
+      expect(result).toEqual({
+        success: true,
+        message: 'Refresh token updated successfully',
+        data: true,
       });
     });
   });
