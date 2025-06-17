@@ -47,7 +47,6 @@ function AuthorLi(props: AuthorLiProps) {
     </li>
   );
 
-
 }
 
 export default AuthorLi;

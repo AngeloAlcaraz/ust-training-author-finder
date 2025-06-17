@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
 import type { Author } from "../model/Author";
 import AuthorLi from "../components/authors/authorLi.component";
+import authorAPI from "../services/author.service";
 
 function AuthorsPage() {
 
@@ -45,18 +46,13 @@ function AuthorsPage() {
     setSimilarAuthors([]); // Clear recommendations
     setCurrentAuthorForRec(null); // Clear recommendations target
 
-
     //Call data service to search authors by name
     try {
-      const response = await fetch(`https://openlibrary.org/search/authors.json?q=${encodeURIComponent(searchText)}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log("Search Results:", data.docs);
-      setSearchResults(data.docs || []);
-      if (data.docs.length === 0) {
-        showMessage('No authors found for your search query.', 'info');
+      const data = await authorAPI.getAuthorsByName(searchText.trim());
+
+      setSearchResults(data || []);
+      if (data.length === 0) {
+        showMessage("No authors found for your search query.", "info");
       }
     } catch (error) {
       console.error("Error searching authors:", error);
@@ -72,18 +68,21 @@ function AuthorsPage() {
     setLoading(true);
     try {
       // Fetch author details
-      const authorResponse = await fetch(`https://openlibrary.org/authors/${authorKey}.json`);
-      if (!authorResponse.ok) throw new Error(`Failed to fetch author details: ${authorResponse.status}`);
-      const authorData = await authorResponse.json();
-      console.log("Author Data:", authorData);
+      // const authorResponse = await fetch(`https://openlibrary.org/authors/${authorKey}.json`);
+      // if (!authorResponse.ok) throw new Error(`Failed to fetch author details: ${authorResponse.status}`);
+      // const authorData = await authorResponse.json();
+      // console.log("Author Data:", authorData);
 
 
-      // Fetch author's works
-      const worksResponse = await fetch(`https://openlibrary.org/authors/${authorKey}/works.json`);
-      if (!worksResponse.ok) throw new Error(`Failed to fetch author works: ${worksResponse.status}`);
-      const worksData = await worksResponse.json();
-      setAuthorWorks(worksData.entries || []);
-      setView('authorDetails');
+      // // Fetch author's works
+      // const worksResponse = await fetch(`https://openlibrary.org/authors/${authorKey}/works.json`);
+      // if (!worksResponse.ok) throw new Error(`Failed to fetch author works: ${worksResponse.status}`);
+      // const worksData = await worksResponse.json();
+
+      const data = await authorAPI.getAuthorById(authorKey);
+      setAuthorWorks(data);
+      //! deberia navegarse a la pagina de detalles del autor
+      //setView('authorDetails');
     } catch (error) {
       console.error("Error fetching author details/works:", error);
       showMessage('Failed to load author details and books. Please try again.', 'error');
