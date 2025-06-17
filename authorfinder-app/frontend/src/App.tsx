@@ -4,7 +4,7 @@ import { NavLink, Route, Routes } from "react-router";
 
 import './App.css'
 import useIsMobile from './hooks/useIsMobil';
-import AuthorsPage from './pages/AuthorsPage';
+import AuthorsPage from './pages/authorsPage';
 // import ResponsiveAppBar from './components/header/responsiveAppBar.component'
 // import ElevateAppBar from './components/header/elevationScroll.component'
 
@@ -20,16 +20,6 @@ function App() {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body {
-          font-family: 'Inter', sans-serif;
-        }
-        button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      `}</style>
 
       <header className="App-header">
         <nav className="navbar navbar-expand-lg bg-body-tertiary">

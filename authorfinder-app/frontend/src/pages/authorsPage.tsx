@@ -1,9 +1,11 @@
 import { useRef, useState, type SyntheticEvent } from "react";
 import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles } from 'lucide-react';
+import MessageBox from "../components/share/message.component";
 import { Link } from "react-router";
+import LoadingSpinner from "../components/share/loadingSpinner.component";
 
 function AuthorsPage() {
-  const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
+
   type Author = {
     cover_id: any;
     key: string;
@@ -11,6 +13,7 @@ function AuthorsPage() {
     top_work?: string;
     // Add other properties as needed
   };
+  const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
 
   const [searchResults, setSearchResults] = useState<Author[]>([]);
   const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null); // Full author object from Open Library
@@ -46,6 +49,8 @@ function AuthorsPage() {
     setSimilarAuthors([]); // Clear recommendations
     setCurrentAuthorForRec(null); // Clear recommendations target
 
+
+    //Call data service to search authors by name
     try {
       const response = await fetch(`https://openlibrary.org/search/authors.json?q=${encodeURIComponent(searchText)}`);
       if (!response.ok) {
@@ -102,7 +107,7 @@ function AuthorsPage() {
     }
   };
 
-  //* Share Component
+  //* Show message box with auto-hide functionality
   const showMessage = (msg: string, type = 'info', duration = 3000) => {
     setMessage(msg);
     setMessageType(type);
@@ -119,78 +124,7 @@ function AuthorsPage() {
     }
   };
 
-  //* Share Component
-  const MessageBox = ({ message, type, onClose }: { message: string; type: string; onClose: () => void }) => {
-    let bgColor, textColor, icon;
-    switch (type) {
-      case 'success':
-        bgColor = 'alert alert-success';
-        textColor = 'text-black';
-        icon = '✅';
-        break;
-      case 'error':
-        bgColor = 'alert alert-danger';
-        textColor = 'text-black';
-        icon = <AlertCircle size={24} className="text-black" />;
-        break;
-      case 'info':
-        bgColor = 'alert alert-primary';
-        textColor = 'text-black';
-        icon = 'ℹ️';
-        break;
-      case 'confirm':
-        bgColor = 'alert alert-warning';
-        textColor = 'text-black';
-        icon = '⚠️';
-        return (
-          <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-xl flex flex-col items-start gap-3 z-[100] ${bgColor} text-primary-emphasis`}>
-            <div className="flex items-center gap-3 w-full">
-              <div className="text-2xl">{icon}</div>
-              <p className="font-semibold flex-grow">{message}</p>
-              <button onClick={() => handleMessageBoxAction('cancel')} className="ml-auto text-black hover:text-gray-200">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="flex justify-end w-full gap-2 mt-2">
-              <button
-                onClick={() => handleMessageBoxAction('confirm')}
-                className="bg-white text-yellow-700 font-semibold py-1 px-3 rounded-md hover:bg-gray-100 transition duration-150"
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => handleMessageBoxAction('cancel')}
-                className="bg-yellow-700 text-black font-semibold py-1 px-3 rounded-md hover:bg-yellow-800 transition duration-150"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        );
-      default:
-        bgColor = 'alert alert-secondary';
-        textColor = 'text-black';
-        icon = '💬';
-    }
 
-    return (
-
-      <div className={` ${bgColor} text-primary-emphasis`}>
-        <div className="row">
-          <p className="font-semibold"><span>{icon}</span> {message}</p>
-        </div>
-      </div>
-    );
-  };
-
-  //* Share Component
-  const LoadingSpinner = () => (
-    <div className="d-flex justify-content-center">
-      <div className="spinner-border text-primary " style={{ width: "4rem", height: "4rem" }} role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  );
 
 
   return (
@@ -232,7 +166,7 @@ function AuthorsPage() {
         <MessageBox
           message={message}
           type={messageType}
-          onClose={() => handleMessageBoxAction('cancel')} // Allow closing info/error/success boxes
+          onMessageBoxAction={() => handleMessageBoxAction} // Allow closing info/error/success boxes
         />
       )}
 
