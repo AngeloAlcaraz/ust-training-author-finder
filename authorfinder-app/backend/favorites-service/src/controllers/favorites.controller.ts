@@ -14,6 +14,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 
 @ApiTags('Favorites')
@@ -52,15 +53,15 @@ export class FavoritesController {
     };
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Get favorites by user ID' })
+  @Get(':addedBy')
+  @ApiOperation({ summary: 'Get all favorites added by a user' })
   @ApiResponse({
     status: 200,
     description: 'Favorites retrieved successfully',
     type: [FavoriteResponseDto],
   })
-  async findByUser(@Param('userId') userId: string) {
-    const favorites = await this.favoritesService.findByUserId(userId);
+  async findByUser(@Param('addedBy') addedBy: string) {
+    const favorites = await this.favoritesService.findByUserId(addedBy);
     const transformed = plainToInstance(FavoriteResponseDto, favorites, {
       excludeExtraneousValues: true,
     });
@@ -74,16 +75,20 @@ export class FavoritesController {
     };
   }
 
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get favorite details by ID' })
+  @Get(':addedBy/:authorId')
+  @ApiOperation({ summary: 'Get favorite details by user and author ID' })
+  @ApiParam({ name: 'addedBy', type: String, description: 'User who added the favorite' })
+  @ApiParam({ name: 'authorId', type: String, description: 'Author ID of the favorite' })
   @ApiResponse({
     status: 200,
     description: 'Favorite retrieved successfully',
     type: FavoriteResponseDto,
   })
-  async findOne(@Param('id') id: string) {
-    const favorite = await this.favoritesService.findById(id);
+  async findOne(
+    @Param('addedBy') addedBy: string,
+    @Param('authorId') authorId: string,
+  ) {
+    const favorite = await this.favoritesService.findById(addedBy, authorId);
     const transformed = plainToInstance(FavoriteResponseDto, favorite, {
       excludeExtraneousValues: true,
     });
@@ -95,14 +100,19 @@ export class FavoritesController {
     };
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a favorite by ID' })
+  @Delete(':addedBy/:authorId')
+  @ApiOperation({ summary: 'Delete a favorite by user and author ID' })
+  @ApiParam({ name: 'addedBy', type: String, description: 'User who added the favorite' })
+  @ApiParam({ name: 'authorId', type: String, description: 'Author ID of the favorite' })
   @ApiResponse({
     status: 200,
     description: 'Favorite deleted successfully',
   })
-  async delete(@Param('id') id: string) {
-    await this.favoritesService.deleteById(id);
+  async delete(
+    @Param('addedBy') addedBy: string,
+    @Param('authorId') authorId: string,
+  ) {
+    await this.favoritesService.deleteById(addedBy, authorId);
     return {
       success: true,
       message: 'Favorite deleted successfully',

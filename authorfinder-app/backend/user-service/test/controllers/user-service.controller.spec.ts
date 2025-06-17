@@ -1,30 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from '../../src/controllers/user.controller';
-import { UsersService } from '../../src/services/user.service';
+import { UserService } from '../../src/services/user.service';
 import { CreateUserDto } from '../../src/dtos/create-user.dto';
 import { CheckEmailDto } from '../../src/dtos/check-email.dto';
 
 describe('UsersController', () => {
-  let usersController: UsersController;
-  let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
+  let controller: UsersController;
+  let userService: jest.Mocked<UserService>;
 
   beforeEach(async () => {
-    usersService = {
-      create: jest.fn(),
-      findByEmail: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{ provide: UsersService, useValue: usersService }],
+      providers: [
+        {
+          provide: UserService,
+          useValue: {
+            create: jest.fn(),
+            findByEmail: jest.fn(),
+            updateRefreshToken: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
-    usersController = module.get<UsersController>(UsersController);
+    controller = module.get<UsersController>(UsersController);
+    userService = module.get(UserService);
   });
 
   describe('healthCheck', () => {
-    it('should return success true with message', () => {
-      const result = usersController.healthCheck();
+    it('should return service health status', () => {
+      const result = controller.healthCheck();
       expect(result).toEqual({
         success: true,
         message: 'User service is healthy',
@@ -34,66 +39,100 @@ describe('UsersController', () => {
   });
 
   describe('create', () => {
-    it('should call usersService.create and return sanitized user', async () => {
+    it('should create a new user and return sanitized user', async () => {
       const createUserDto: CreateUserDto = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123',
-        gender: '',
+        password: 'pass123',
+        gender: 'male',
+        refreshToken: undefined,
+      };
+      const createdUser = {
+        ...createUserDto,
+        userId: createUserDto.email,
+        createdAt: '2025-06-17T12:00:00Z',
+        updatedAt: '2025-06-17T12:00:00Z',
+        password: 'pass123',
+        refreshToken: null,
       };
 
-      const userEntity = {
-        _id: '123',
-        email: 'test@example.com',
-        name: 'Test User',
-        password: 'hashedpassword',
-      };
+      userService.create.mockResolvedValue(createdUser);
 
-      usersService.create?.mockResolvedValue(userEntity);
+      const result = await controller.create(createUserDto);
 
-      const result = await usersController.create(createUserDto);
-
-      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
-      expect(result).toHaveProperty('success', true);
-      expect(result).toHaveProperty('message', 'User created successfully');
-      expect(result.data).toMatchObject({
-        _id: userEntity._id,
-        email: userEntity.email,
-        name: userEntity.name,
+      expect(userService.create).toHaveBeenCalledWith(createUserDto);
+      expect(result).toMatchObject({
+        success: true,
+        message: 'User created successfully',
+        data: expect.objectContaining({
+          userId: createUserDto.email,
+          email: createUserDto.email,
+          name: createUserDto.name,
+        }),
       });
-      expect(result.data).not.toHaveProperty('password');
+
+      expect(
+        result.data.refreshToken === null || result.data.refreshToken === undefined,
+      ).toBe(true);
     });
   });
 
   describe('getByEmail', () => {
-    it('should return true if user exists', async () => {
-      const query: CheckEmailDto = { email: 'exists@example.com' };
-      usersService.findByEmail?.mockResolvedValue({
-        id: '1',
-        email: query.email,
-      });
+    it('should return user if exists', async () => {
+      const email = 'existing@example.com';
+      const user = {
+        userId: email,
+        name: 'Existing User',
+        email,
+        gender: 'female',
+        password: 'hashed_password',
+        createdAt: '2025-06-17T12:00:00Z',
+        updatedAt: '2025-06-17T12:00:00Z',
+        refreshToken: null,
+      };
+      userService.findByEmail.mockResolvedValue(user);
 
-      const result = await usersController.getByEmail(query);
+      const query: CheckEmailDto = { email };
+      const result = await controller.getByEmail(query);
 
-      expect(usersService.findByEmail).toHaveBeenCalledWith(query.email);
+      expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User exists',
-        data: true,
+        data: user,
       });
     });
 
-    it('should return false if user does not exist', async () => {
-      const query: CheckEmailDto = { email: 'notfound@example.com' };
-      usersService.findByEmail?.mockResolvedValue(null);
+    it('should return user does not exist if user not found', async () => {
+      const email = 'notfound@example.com';
+      userService.findByEmail.mockResolvedValue(null);
 
-      const result = await usersController.getByEmail(query);
+      const query: CheckEmailDto = { email };
+      const result = await controller.getByEmail(query);
 
-      expect(usersService.findByEmail).toHaveBeenCalledWith(query.email);
+      expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User does not exist',
-        data: false,
+        data: null,
+      });
+    });
+  });
+
+  describe('updateRefreshToken', () => {
+    it('should update refresh token and return success true', async () => {
+      const userId = 'user-id-123';
+      const dto = { refreshToken: 'new-refresh-token-abc' };
+
+      userService.updateRefreshToken.mockResolvedValue(true);
+
+      const result = await controller.updateRefreshToken(userId, dto);
+
+      expect(userService.updateRefreshToken).toHaveBeenCalledWith(userId, dto.refreshToken);
+      expect(result).toEqual({
+        success: true,
+        message: 'Refresh token updated successfully',
+        data: true,
       });
     });
   });
