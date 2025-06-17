@@ -25,8 +25,6 @@ function AuthorLi(props: AuthorLiProps) {
             <h5 className="mb-1 font-semibold">{author.name}</h5>
           </div>
         </Link>
-
-
         <small>
           <button className="btn btn-outline-danger btn-md text-decoration-none">
             {/* <span className="bi bi-heart-fill"></span> */}

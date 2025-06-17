@@ -5,9 +5,13 @@ import { Link } from "react-router";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
 import type { Author } from "../model/Author";
 import AuthorLi from "../components/authors/authorLi.component";
+import AuthorCard from "../components/authors/authorCard.component";
 import authorAPI from "../services/author.service";
+import useIsMobile from "../hooks/useIsMobil";
 
 function AuthorsPage() {
+
+  const isMobile = useIsMobile();
 
 
   const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
@@ -165,11 +169,24 @@ function AuthorsPage() {
       {searchResults.length > 0 && (
         <div className="shadow-lg rounded-lg p-4 bg-white">
           <h3 className="text-2xl font-bold text-gray-700 mb-4">Search Results</h3>
-          <ul className="list-group list-group-flush">
-            {searchResults.map((author) => (
-              <AuthorLi author={author}></AuthorLi>
-            ))}
-          </ul>
+
+          {isMobile && (
+            <ul className="list-group list-group-flush">
+              {searchResults.map((author) => (
+                <AuthorLi author={author}></AuthorLi>
+              ))}
+            </ul>
+          )}
+
+          {!isMobile && (
+            <ul className="list-group list-group-flush">
+              <div className="row row-cols-1 row-cols-md-3 g-4 ">
+                {searchResults.map((author) => (
+                  <AuthorCard author={author}></AuthorCard>
+                ))}
+              </div>
+            </ul>
+          )}
         </div>
       )}
 
