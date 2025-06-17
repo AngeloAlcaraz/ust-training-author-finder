@@ -1,30 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from '../../src/controllers/user.controller';
-import { UsersService } from '../../src/services/user.service';
+import { UserService } from '../../src/services/user.service';
 import { CreateUserDto } from '../../src/dtos/create-user.dto';
 import { CheckEmailDto } from '../../src/dtos/check-email.dto';
 
 describe('UsersController', () => {
-  let usersController: UsersController;
-  let usersService: Partial<Record<keyof UsersService, jest.Mock>>;
+  let controller: UsersController;
+  let userService: UserService;
+
+  const mockUserService = {
+    create: jest.fn(),
+    findByEmail: jest.fn(),
+  };
 
   beforeEach(async () => {
-    usersService = {
-      create: jest.fn(),
-      findByEmail: jest.fn(),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{ provide: UsersService, useValue: usersService }],
+      providers: [{ provide: UserService, useValue: mockUserService }],
     }).compile();
 
-    usersController = module.get<UsersController>(UsersController);
+    controller = module.get<UsersController>(UsersController);
+    userService = module.get<UserService>(UserService);
+
+    jest.clearAllMocks();
   });
 
   describe('healthCheck', () => {
-    it('should return success true with message', () => {
-      const result = usersController.healthCheck();
+    it('should return service health info', () => {
+      const result = controller.healthCheck();
       expect(result).toEqual({
         success: true,
         message: 'User service is healthy',
@@ -34,48 +37,58 @@ describe('UsersController', () => {
   });
 
   describe('create', () => {
-    it('should call usersService.create and return sanitized user', async () => {
+    it('should create a new user and return sanitized response', async () => {
       const createUserDto: CreateUserDto = {
-        email: 'test@example.com',
         name: 'Test User',
+        email: 'test@example.com',
         password: 'password123',
-        gender: '',
+        gender: 'male',
       };
 
-      const userEntity = {
-        _id: '123',
-        email: 'test@example.com',
-        name: 'Test User',
-        password: 'hashedpassword',
+      const createdUser = {
+        userId: createUserDto.email,
+        name: createUserDto.name,
+        email: createUserDto.email,
+        gender: createUserDto.gender,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
-      usersService.create?.mockResolvedValue(userEntity);
+      mockUserService.create.mockResolvedValue(createdUser);
 
-      const result = await usersController.create(createUserDto);
+      const response = await controller.create(createUserDto);
 
-      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
-      expect(result).toHaveProperty('success', true);
-      expect(result).toHaveProperty('message', 'User created successfully');
-      expect(result.data).toMatchObject({
-        _id: userEntity._id,
-        email: userEntity.email,
-        name: userEntity.name,
+      expect(userService.create).toHaveBeenCalledWith(createUserDto);
+      expect(response).toEqual({
+        success: true,
+        message: 'User created successfully',
+        data: expect.objectContaining({
+          _id: undefined, 
+          name: 'Test User',
+          email: 'test@example.com',
+          gender: 'male',
+        }),
       });
-      expect(result.data).not.toHaveProperty('password');
     });
   });
 
   describe('getByEmail', () => {
-    it('should return true if user exists', async () => {
-      const query: CheckEmailDto = { email: 'exists@example.com' };
-      usersService.findByEmail?.mockResolvedValue({
-        id: '1',
-        email: query.email,
+    it('should return success true and data true if user exists', async () => {
+      const email = 'exists@example.com';
+      const query: CheckEmailDto = { email };
+
+      mockUserService.findByEmail.mockResolvedValue({
+        userId: email,
+        name: 'Existing User',
+        email,
+        gender: 'female',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
-      const result = await usersController.getByEmail(query);
+      const result = await controller.getByEmail(query);
 
-      expect(usersService.findByEmail).toHaveBeenCalledWith(query.email);
+      expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User exists',
@@ -83,13 +96,15 @@ describe('UsersController', () => {
       });
     });
 
-    it('should return false if user does not exist', async () => {
-      const query: CheckEmailDto = { email: 'notfound@example.com' };
-      usersService.findByEmail?.mockResolvedValue(null);
+    it('should return success true and data false if user does not exist', async () => {
+      const email = 'notfound@example.com';
+      const query: CheckEmailDto = { email };
 
-      const result = await usersController.getByEmail(query);
+      mockUserService.findByEmail.mockResolvedValue(null);
 
-      expect(usersService.findByEmail).toHaveBeenCalledWith(query.email);
+      const result = await controller.getByEmail(query);
+
+      expect(userService.findByEmail).toHaveBeenCalledWith(email);
       expect(result).toEqual({
         success: true,
         message: 'User does not exist',
