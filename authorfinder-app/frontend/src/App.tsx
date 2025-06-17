@@ -20,9 +20,8 @@ function App() {
 
   return (
     <>
-
-      <header className="App-header">
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <header className="App-header sticky-top ">
+        <nav className="navbar sticky-top   navbar-expand-lg bg-body-tertiary ">
           <div className="container-fluid">
             <NavLink to="/" className="navbar-brand">Logo</NavLink>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

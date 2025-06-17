@@ -3,16 +3,12 @@ import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles
 import MessageBox from "../components/share/message.component";
 import { Link } from "react-router";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
+import type { Author } from "../model/Author";
+import AuthorLi from "../components/authors/authorLi.component";
 
 function AuthorsPage() {
 
-  type Author = {
-    cover_id: any;
-    key: string;
-    name: string;
-    top_work?: string;
-    // Add other properties as needed
-  };
+
   const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
 
   const [searchResults, setSearchResults] = useState<Author[]>([]);
@@ -124,9 +120,6 @@ function AuthorsPage() {
     }
   };
 
-
-
-
   return (
     <>
       <div className="col-12 mb-2">
@@ -175,46 +168,11 @@ function AuthorsPage() {
           <h3 className="text-2xl font-bold text-gray-700 mb-4">Search Results</h3>
           <ul className="list-group list-group-flush">
             {searchResults.map((author) => (
-              <li key={author.key} className="list-group-item">
-
-                <div className="d-flex w-100 justify-content-between">
-                  <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
-                    <div className="d-flex align-items-center gap-3">
-                      {/* <img
-                          // src={`https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`}
-                          src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOVriLPru6AjmM5u0mjgJA67XQfeM27a1gAA&s`}
-
-                          alt={author.name}
-                          className="img-fluid"
-                        /> */}
-                      <h5 className="mb-1 font-semibold">{author.name}</h5>
-                    </div>
-                  </Link>
-
-
-                  <small>
-                    <button className="btn btn-outline-danger btn-md text-decoration-none">
-                      {/* <span className="bi bi-heart-fill"></span> */}
-                      <span className="bi bi-heart"></span>
-
-                    </button>
-                  </small>
-                </div>
-
-                <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
-
-                  {author.top_work && (
-                    <p >Top Work: {author.top_work}</p>
-                  )}
-
-                  <small>View details...</small>
-                </Link>
-              </li>
+              <AuthorLi author={author}></AuthorLi>
             ))}
           </ul>
         </div>
       )}
-
 
       {loading && <LoadingSpinner />}
     </>

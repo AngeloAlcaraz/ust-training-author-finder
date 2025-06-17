@@ -2,7 +2,6 @@ import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles
 import { useState } from 'react';
 
 
-
 interface MessageBoxProps {
   message: string;
   type: string;
