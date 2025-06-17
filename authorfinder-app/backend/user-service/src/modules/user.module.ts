@@ -1,18 +1,13 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UsersService } from '../services/user.service';
 import { UsersController } from '../controllers/user.controller';
-import { User, UserSchema } from '../schemas/user.schema';
+import { UserService } from '../services/user.service';
 import { LoggingMiddleware } from '../common/middleware/logging-middleware';
+import { DynamoModule } from './dynamo.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema, collection: 'users' },
-    ]),
-  ],
+  imports: [DynamoModule],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UserService],
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

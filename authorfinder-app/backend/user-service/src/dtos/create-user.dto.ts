@@ -6,7 +6,6 @@ import {
   IsString,
 } from 'class-validator';
 import {
-  ApiHideProperty,
   ApiProperty,
   ApiPropertyOptional,
 } from '@nestjs/swagger';
@@ -40,7 +39,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   gender: string;
 
-  @ApiHideProperty()
+  @ApiPropertyOptional({ example: 'abc123token', description: 'JWT refresh token' })
   @IsString()
   @IsOptional()
   refreshToken?: string;

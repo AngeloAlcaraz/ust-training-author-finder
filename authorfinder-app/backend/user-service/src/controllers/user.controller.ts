@@ -4,10 +4,11 @@ import {
   Get,
   Body,
   Query,
+  Param,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
-import { UsersService } from '../services/user.service';
-import { CreateUserDto } from '../dtos/create-user.dto';
+import { UserService } from '../services/user.service';
 import { CheckEmailDto } from '../dtos/check-email.dto';
 import { UserResponseDto } from '../dtos/user-response.dto';
 import { plainToInstance } from 'class-transformer';
@@ -16,12 +17,15 @@ import {
   ApiOperation,
   ApiResponse,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/dtos/create-user.dto';
+import { UpdateRefreshTokenDto } from 'src/dtos/refresh-token-response-dto';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UserService) { }
 
   @Get('health')
   @ApiOperation({ summary: 'Health check for the users service' })
@@ -39,13 +43,26 @@ export class UsersController {
   @ApiResponse({
     status: 201,
     description: 'User created successfully',
-    type: UserResponseDto,
+    schema: {
+      example: {
+        success: true,
+        message: 'User created successfully',
+        data: {
+          userId: 'abc123',
+          name: 'John Doe',
+          email: 'john@example.com',
+          gender: 'male',
+          password: 'hashed_password',
+          createdAt: '2025-06-17T12:34:56.789Z',
+          updatedAt: '2025-06-17T12:34:56.789Z',
+          refreshToken: null,
+        },
+      },
+    },
   })
   async create(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
-    const sanitizedUser = plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    const sanitizedUser = plainToInstance(UserResponseDto, user);
 
     return {
       success: true,
@@ -54,7 +71,7 @@ export class UsersController {
     };
   }
 
-  @Get('email')
+  @Get(':email')
   @ApiOperation({ summary: 'Check if a user exists by email' })
   @ApiQuery({
     name: 'email',
@@ -70,7 +87,16 @@ export class UsersController {
       example: {
         success: true,
         message: 'User exists',
-        data: true,
+        data: {
+          userId: 'john@example.com',
+          name: 'John Doe',
+          email: 'john@example.com',
+          gender: 'male',
+          password: 'hashed_password',
+          createdAt: '2025-06-17T12:34:56.789Z',
+          updatedAt: '2025-06-17T12:34:56.789Z',
+          refreshToken: null,
+        },
       },
     },
   })
@@ -82,7 +108,30 @@ export class UsersController {
     return {
       success: true,
       message: user ? 'User exists' : 'User does not exist',
-      data: !!user,
+      data: user,
+    };
+  }
+
+  @Patch('refresh-token/:userId')
+  @ApiOperation({ summary: 'Update only the refresh token for the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Refresh token updated successfully',
+    schema: {
+      example: { success: true, message: 'Refresh token updated successfully', data: true },
+    },
+  })
+  @ApiBody({ type: UpdateRefreshTokenDto })
+  async updateRefreshToken(
+    @Param('userId') userId: string,
+    @Body() body: UpdateRefreshTokenDto,
+  ) {
+    const success = await this.usersService.updateRefreshToken(userId, body.refreshToken);
+
+    return {
+      success: true,
+      message: 'Refresh token updated successfully',
+      data: success,
     };
   }
 }

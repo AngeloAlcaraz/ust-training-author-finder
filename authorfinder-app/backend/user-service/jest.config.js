@@ -16,6 +16,7 @@ module.exports = {
     "src/main.ts",
     "src/app.module.ts",
     "src/modules/",
-    '\\.dtos\\.ts$',    
+    '\\.dtos\\.ts$',
+    '\\.schema\\.ts$',
   ],
 };
