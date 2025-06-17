@@ -1,7 +1,7 @@
 // useIsMobile.js
 import { useState, useEffect } from 'react';
 
-const MOBILE_BREAKPOINT = 992; // Define tu breakpoint para móvil
+const MOBILE_BREAKPOINT = 992; // define your breakpoint for mobile devices
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
