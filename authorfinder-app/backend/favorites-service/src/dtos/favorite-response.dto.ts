@@ -14,9 +14,9 @@ export class FavoriteResponseDto {
   @Expose()
   name: string;
 
-  @ApiPropertyOptional({ example: ['Samuel Langhorne Clemens', 'S.L. Clemens'] })
+  @ApiPropertyOptional({ example: 'https://example.com/image.jpg' })
   @Expose()
-  alternateNames?: string[];
+  imageUrl?: string;
 
   @ApiPropertyOptional({ example: '1835-11-30' })
   @Expose()
@@ -29,22 +29,6 @@ export class FavoriteResponseDto {
   @ApiPropertyOptional({ example: 'The Adventures of Tom Sawyer' })
   @Expose()
   topWork?: string;
-
-  @ApiPropertyOptional({ example: ['American literature', 'Humorists, American'] })
-  @Expose()
-  topSubjects?: string[];
-
-  @ApiPropertyOptional({ example: 42 })
-  @Expose()
-  workCount?: number;
-
-  @ApiPropertyOptional({ example: 4.5 })
-  @Expose()
-  ratingsAverage?: number;
-
-  @ApiPropertyOptional({ example: 1234 })
-  @Expose()
-  ratingsCount?: number;
 
   @ApiProperty({ example: 'user_123' })
   @Expose()
