@@ -1,16 +1,7 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import {
-  DynamoDBDocumentClient,
-  PutCommand,
-  QueryCommand,
-  GetCommand,
-  DeleteCommand,
-} from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { FavoritesQueueService } from '../queues/favorites-queue.service';
 
 @Injectable()
 export class FavoritesService {
@@ -18,36 +9,22 @@ export class FavoritesService {
   private readonly ddbDocClient: DynamoDBDocumentClient;
   private readonly tableName = 'Favorites';
 
-  constructor() {
-    this.ddbClient = new DynamoDBClient({});
+  constructor(private readonly favoritesQueueService: FavoritesQueueService) {
+    this.ddbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
     this.ddbDocClient = DynamoDBDocumentClient.from(this.ddbClient);
   }
 
   async create(createFavoriteDto: any): Promise<any> {
-    const key = {
-      addedBy: createFavoriteDto.addedBy,
-      authorId: createFavoriteDto.authorId,
-    };
-
-    const existing = await this.ddbDocClient.send(
-      new GetCommand({
-        TableName: this.tableName,
-        Key: key,
-      }),
-    );
-
-    if (existing.Item) {
-      throw new ConflictException('This author is already in your favorites.');
+    try {
+      await this.favoritesQueueService.enqueueFavorite(createFavoriteDto);
+    } catch (error) {
+      console.error('Error sending message to the queue:', error);
+      throw new ConflictException('Error sending message to the queue');
     }
-
-    await this.ddbDocClient.send(
-      new PutCommand({
-        TableName: this.tableName,
-        Item: createFavoriteDto,
-      }),
-    );
-
-    return createFavoriteDto;
+    return {
+      ...createFavoriteDto,
+      message: 'Favorite is being processed asynchronously',
+    };
   }
 
   async findByUserId(userId: string): Promise<any[]> {
