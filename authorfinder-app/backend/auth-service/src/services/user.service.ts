@@ -16,7 +16,7 @@ export class UserService {
     
     async createUser(userData: any): Promise<any> {
         const response = await this.api.instance.post("/users", userData);
-        return response.data.data;
+        return response.data.data; // Axios response structure includes a 'data' field with the original response from the API
     }
 
     async findByEmail(email: string): Promise<any> {
@@ -25,16 +25,7 @@ export class UserService {
     }
 
     async update(userId: string, updateData: any): Promise<any> {
-        // const response = await this.api.instance.put(`/users/${userId}`, updateData);
-        // return response.data;
-        
-        return { 
-            id: 'newUserId', 
-            name: 'newUsername',
-            email: 'test@example.com',
-            gender: 'male',
-            refreshToken: 'newRefreshToken',
-
-        }; // Mock response for testing
+        const response = await this.api.instance.patch(`/users/refresh-token/${userId}`, updateData);
+        return response.data.data; // Axios response structure includes a 'data' field with the original response from the API
     }
 }

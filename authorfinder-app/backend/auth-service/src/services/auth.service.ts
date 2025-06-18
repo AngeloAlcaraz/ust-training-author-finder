@@ -67,12 +67,8 @@ export class AuthService {
             password: hashedPassword,
         });
 
-        //const tokens = await this.getTokens(newUser.id, newUser.username);
-        //await this.updateRefreshToken(newUser.id, tokens.refreshToken);
-
         return {
-            //...tokens,
-            id: newUser.id,
+            userId: newUser.userId,
             name: newUser.name,
             email: newUser.email,
             gender: newUser.gender,
@@ -82,21 +78,17 @@ export class AuthService {
     }
 
     async signIn(data: AuthDto): Promise<ILoginResponse> {
-        //const user = await this.userService.findByEmail(data.email);
-        //TODO: REMOVE COMMENT, WAITING FOR USER SERVICE TO BE READY
-        /*if (!user || !(await argon2.verify(user.password, data.password))) {
+        const user = await this.userService.findByEmail(data.email);
+        if (!user || !(await argon2.verify(user.password, data.password))) {
             throw new BadRequestException("Invalid credentials");
-        }*/
-        var user: any = { id:'', username:'string'}; // Temporary fix for testing, remove when user service is ready
-        user.id = '6851aecd1f9571b99dc1c456'; // Temporary fix for testing, remove when user service is ready
-        user.username = 'John Doe'; // Temporary fix for testing, remove when user service is ready
-
-        const tokens = await this.getTokens(user.id, user.username, user.email);
-        await this.updateRefreshToken(user.id, tokens.refreshToken);
+        }
+        
+        const tokens = await this.getTokens(user.userId, user.name, user.email);
+        await this.updateRefreshToken(user.userId, tokens.refreshToken);
 
         return {
             ...tokens,
-            id: user.id,
+            userId: user.userId,
             name: user.name,
             email: user.email,
             gender: user.gender
@@ -104,13 +96,11 @@ export class AuthService {
     }
 
     async logout(userId: string): Promise<void> {
-        await this.userService.update(userId, { refreshToken: null });
+        await this.userService.update(userId, { refreshToken: '' });
     }
 
-    async refreshTokens(userId: string, refreshToken: string): Promise<ILoginResponse> {
-
-        // TODO: It's necessary to create a user service method to find user by ID
-        const user = await this.userService.findByEmail(userId);
+    async refreshTokens(email: string, refreshToken: string): Promise<ILoginResponse> {
+        const user = await this.userService.findByEmail(email);
         if (!user || !user.refreshToken) {
             throw new BadRequestException("User not found or no refresh token");
         }
@@ -120,12 +110,12 @@ export class AuthService {
             throw new BadRequestException("Invalid refresh token");
         }
 
-        const tokens = await this.getTokens(user.id, user.username, user.email);
-        await this.updateRefreshToken(user.id, tokens.refreshToken);
+        const tokens = await this.getTokens(user.userId, user.name, user.email);
+        await this.updateRefreshToken(user.userId, tokens.refreshToken);
 
         return {
             ...tokens,
-            id: user.id,
+            userId: user.userId,
             name: user.name,
             email: user.email,
             gender: user.gender,

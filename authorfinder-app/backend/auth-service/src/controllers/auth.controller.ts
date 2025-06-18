@@ -46,10 +46,10 @@ export class AuthController {
     @ApiOkResponse({ description: "User session successfully refreshed" })
     @ApiBadRequestResponse({ description: "Refresh failed" })
     async refreshToken(
-        @AuthUser('sub') sub: string,
+        @AuthUser('sub') userId: string,
         @AuthUser('refreshToken') refreshToken: string
     ) {
-        const newToken = await this.authService.refreshTokens(sub, refreshToken);
+        const newToken = await this.authService.refreshTokens(userId, refreshToken);
         return { message: "User session successfully refreshed", data: newToken };
     }
 }
