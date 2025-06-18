@@ -1,37 +1,20 @@
-version: '3.8'
-
 services:
   user-service:
     image: angeloalcaraz/user-service:latest
     container_name: user-service
     ports:
-      - "3000:3000"
-    depends_on:
-      - mongo
+      - "${PORT_USER_SERVICE}:3000"
+    env_file:
+      - .env
     environment:
-      - MONGODB_URI=mongodb://mongo:27017
-      - MONGODB_DB=users_db
-      - PORT=3000
+      PORT: ${PORT_USER_SERVICE}
 
   favorites-service:
     image: angeloalcaraz/favorites-service:latest
     container_name: favorites-service
     ports:
-      - "3001:3001"
-    depends_on:
-      - mongo
+      - "${PORT_FAVORITES_SERVICE}:3001"
+    env_file:
+      - .env
     environment:
-      - MONGODB_URI=mongodb://mongo:27017
-      - MONGODB_DB=favorites_db
-      - PORT=3001
-
-  mongo:
-    image: mongo:6.0
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
+      PORT: ${PORT_FAVORITES_SERVICE}
