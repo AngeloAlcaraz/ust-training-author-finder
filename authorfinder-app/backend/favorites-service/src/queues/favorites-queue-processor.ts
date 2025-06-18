@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk/client-sqs';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 
 const region = process.env.AWS_REGION ?? 'us-east-1';
 const queueUrl = process.env.FAVORITES_QUEUE_URL;
@@ -27,16 +27,33 @@ async function pollQueue() {
 
     if (response.Messages && response.Messages.length > 0) {
       const message = response.Messages[0];
+      const body = JSON.parse(message.Body!);
 
       try {
-        const favorite = JSON.parse(message.Body!);
+        if (body.type === 'AddFavorite') {
+          await ddbDocClient.send(
+            new PutCommand({
+              TableName: tableName,
+              Item: body,
+            })
+          );
+          console.log(`Added favorite to DynamoDB: ${body.authorId}`);
+        } else if (body.type === 'RemoveFavorite') {
 
-        await ddbDocClient.send(
-          new PutCommand({
-            TableName: tableName,
-            Item: favorite,
-          })
-        );
+          await ddbDocClient.send(
+            new DeleteCommand({
+              TableName: tableName,
+              Key: {
+                addedBy: body.addedBy,
+                authorId: body.authorId,
+              },
+            })
+          );
+          console.log(`Removed favorite from DynamoDB: ${body.authorId}`);
+
+        } else {
+          console.warn('Unknown message type:', body.type);
+        }
 
         await sqsClient.send(
           new DeleteMessageCommand({

@@ -26,4 +26,20 @@ export class FavoritesService {
 
     await this.client.send(command);
   }
+
+  async enqueueFavoriteRemoved(authorId: string, addedBy: string) {
+    const message = {
+      type: 'RemoveFavorite',
+      authorId,
+      addedBy,
+      timestamp: new Date().toISOString(),
+    };
+
+    const command = new SendMessageCommand({
+      QueueUrl: this.queueUrl,
+      MessageBody: JSON.stringify(message),
+    });
+
+    await this.client.send(command);
+  }
 }

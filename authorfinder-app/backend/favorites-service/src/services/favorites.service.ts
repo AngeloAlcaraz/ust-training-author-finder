@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, QueryCommand, GetCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { FavoritesQueueService } from '../queues/favorites-queue.service';
 
 @Injectable()
@@ -75,18 +75,16 @@ export class FavoritesService {
   }
 
   async deleteById(addedBy: string, authorId: string): Promise<void> {
-    const params = {
-      TableName: this.tableName,
-      Key: {
+    try {
+      await this.favoritesQueueService.enqueueFavorite({
+        type: 'RemoveFavorite',
         addedBy,
         authorId,
-      },
-      ReturnValues: 'ALL_OLD' as const,
-    };
-
-    const result = await this.ddbDocClient.send(new DeleteCommand(params));
-    if (!result.Attributes) {
-      throw new NotFoundException('Favorite not found.');
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error sending delete message to the queue:', error);
+      throw new ConflictException('Error sending delete message to the queue');
     }
   }
 }
