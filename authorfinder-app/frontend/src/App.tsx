@@ -5,6 +5,8 @@ import { NavLink, Route, Routes } from "react-router";
 import './App.css'
 import useIsMobile from './hooks/useIsMobil';
 import AuthorsPage from './pages/authorsPage';
+import LoginPage from './pages/login/loginPage';
+import RegisterPage from './pages/login/registerPage';
 // import ResponsiveAppBar from './components/header/responsiveAppBar.component'
 // import ElevateAppBar from './components/header/elevationScroll.component'
 
@@ -71,8 +73,8 @@ function App() {
           <Route path="/" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/authors" element={<AuthorsPage />} />
           <Route path="/favorites" element={<h1>My Favorites</h1>} />
-          <Route path="/register" element={<h1>Register Page</h1>} />
-          <Route path="/login" element={<h1>Login Page</h1>} />
+          <Route path="/register" element={<RegisterPage onLoginError={() => { }} onLoginSuccess={() => { }} />} />
+          <Route path="/login" element={<LoginPage onLoginError={() => { }} onLoginSuccess={() => { }} />} />
           <Route path="/profile" element={<h1>User Profile</h1>} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
