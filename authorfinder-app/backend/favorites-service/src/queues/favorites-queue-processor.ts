@@ -43,6 +43,8 @@ export async function pollQueue() {
             new PutCommand({
               TableName: tableName,
               Item: body,
+              ConditionExpression:
+                'attribute_not_exists(addedBy) AND attribute_not_exists(authorId)',
             }),
           );
           console.log(`Added favorite to DynamoDB: ${body.authorId}`);
@@ -60,15 +62,25 @@ export async function pollQueue() {
         } else {
           console.warn('Unknown message type:', body.type);
         }
-
+       
         await sqsClient.send(
           new DeleteMessageCommand({
             QueueUrl: queueUrl,
             ReceiptHandle: message.ReceiptHandle!,
           }),
         );
-      } catch (processingError) {
-        console.error('Error processing message:', processingError);
+      } catch (processingError: any) {
+        if (processingError.name === 'ConditionalCheckFailedException') {
+          console.warn(`Favorite already exists: ${body.authorId}`);         
+          await sqsClient.send(
+            new DeleteMessageCommand({
+              QueueUrl: queueUrl,
+              ReceiptHandle: message.ReceiptHandle!,
+            }),
+          );
+        } else {
+          console.error('Error processing message:', processingError);          
+        }
       }
     }
   } catch (err) {
@@ -83,7 +95,6 @@ async function startPolling() {
   }
 }
 
-// Export the pollQueue function for testing purposes
 if (require.main === module) {
   startPolling();
 }

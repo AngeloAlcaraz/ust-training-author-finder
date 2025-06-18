@@ -23,7 +23,6 @@ describe('FavoritesService', () => {
 
     service = new FavoritesService(mockFavoritesQueueService as FavoritesQueueService);
 
-    // Mockeamos el ddbDocClient.send
     // @ts-ignore
     service.ddbDocClient = {
       send: mockDdbDocClientSend,
@@ -31,12 +30,16 @@ describe('FavoritesService', () => {
   });
 
   describe('create', () => {
-    it('should enqueue favorite and return message', async () => {
-      const dto = { authorId: '123', addedBy: 'user1' };
+    const dto = { authorId: '123', addedBy: 'user1' };
+
+    it('should enqueue favorite and return message when favorite does NOT exist', async () => {      
+      mockDdbDocClientSend.mockRejectedValueOnce(new NotFoundException());
+
       (mockFavoritesQueueService.enqueueFavorite as jest.Mock).mockResolvedValue(undefined);
 
       const result = await service.create(dto);
 
+      expect(mockDdbDocClientSend).toHaveBeenCalledWith(expect.any(GetCommand)); 
       expect(mockFavoritesQueueService.enqueueFavorite).toHaveBeenCalledWith(dto);
       expect(result).toEqual({
         ...dto,
@@ -44,10 +47,18 @@ describe('FavoritesService', () => {
       });
     });
 
-    it('should throw ConflictException if enqueue fails', async () => {
+    it('should throw ConflictException if favorite already exists', async () => {      
+      mockDdbDocClientSend.mockResolvedValueOnce({ Item: dto });
+
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
+    });
+
+    it('should throw ConflictException if enqueue fails', async () => {     
+      mockDdbDocClientSend.mockRejectedValueOnce(new NotFoundException());
+
       (mockFavoritesQueueService.enqueueFavorite as jest.Mock).mockRejectedValue(new Error('fail'));
 
-      await expect(service.create({ authorId: '123', addedBy: 'user1' })).rejects.toThrow(ConflictException);
+      await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
   });
 

@@ -16,16 +16,26 @@ export class FavoritesService {
 
   async create(createFavoriteDto: any): Promise<any> {
     try {
+      await this.findById(createFavoriteDto.addedBy, createFavoriteDto.authorId);
+      throw new ConflictException('Favorite already exists');
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+    }
+    try {
       await this.favoritesQueueService.enqueueFavorite(createFavoriteDto);
     } catch (error) {
       console.error('Error sending message to the queue:', error);
       throw new ConflictException('Error sending message to the queue');
     }
+
     return {
       ...createFavoriteDto,
       message: 'Favorite is being processed asynchronously',
     };
   }
+
 
   async findByUserId(userId: string): Promise<any[]> {
     const result = await this.ddbDocClient.send(
