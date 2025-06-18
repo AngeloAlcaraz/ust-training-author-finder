@@ -86,6 +86,14 @@ export class FavoritesService {
 
   async deleteById(addedBy: string, authorId: string): Promise<void> {
     try {
+      await this.findById(addedBy, authorId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Favorite not found');
+      }
+      throw error;
+    }
+    try {
       await this.favoritesQueueService.enqueueFavorite({
         type: 'RemoveFavorite',
         addedBy,
