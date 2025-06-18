@@ -38,7 +38,7 @@ function App() {
                 {isMobile && (
                   <li className="nav-item dropdown ">
                     <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Auth
+                      User
                     </a>
                     <ul className="dropdown-menu">
                       <li><NavLink to="/register" className="nav-link active">Sign up</NavLink></li>

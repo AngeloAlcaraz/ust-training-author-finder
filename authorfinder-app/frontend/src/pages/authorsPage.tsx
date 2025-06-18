@@ -1,4 +1,4 @@
-import { useRef, useState, type SyntheticEvent } from "react";
+import { useMemo, useRef, useState, type SyntheticEvent } from "react";
 import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles } from 'lucide-react';
 import MessageBox from "../components/share/message.component";
 import { Link } from "react-router";
@@ -8,10 +8,12 @@ import AuthorLi from "../components/authors/authorLi.component";
 import AuthorCard from "../components/authors/authorCard.component";
 import authorAPI from "../services/author.service";
 import useIsMobile from "../hooks/useIsMobil";
+import Pagination from "../components/share/pagination.component";
 
 function AuthorsPage() {
 
   const isMobile = useIsMobile();
+  const authorsPerPage = 6; // Number of authors to display per page
 
 
   const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
@@ -21,6 +23,7 @@ function AuthorsPage() {
   const [authorWorks, setAuthorWorks] = useState([]);
   const [similarAuthors, setSimilarAuthors] = useState([]); // Stores LLM-generated similar authors
   const [currentAuthorForRec, setCurrentAuthorForRec] = useState(null); // Author name for whom recommendations are shown
+  const [allAuthorsPage, setAllAuthorsPage] = useState(1); // For pagination of all authors
 
   const [message, setMessage] = useState(''); // For message box
   const [messageType, setMessageType] = useState('info'); // 'info', 'error', 'success', 'confirm'
@@ -123,6 +126,16 @@ function AuthorsPage() {
     }
   };
 
+  const paginatedAllAuthors = useMemo(() => {
+    const startIndex = (allAuthorsPage - 1) * authorsPerPage;
+    const endIndex = startIndex + authorsPerPage;
+    return searchResults.slice(startIndex, endIndex);
+  }, [allAuthorsPage]);
+
+  const totalAllAuthorsPages = useMemo(() => {
+    return Math.ceil(searchResults.length / authorsPerPage);
+  }, []);
+
   return (
     <>
       <div className="col-12 mb-2">
@@ -170,25 +183,45 @@ function AuthorsPage() {
         <div className="shadow-lg rounded-lg p-4 bg-white">
           <h3 className="text-2xl font-bold text-gray-700 mb-4">Search Results</h3>
 
-          {isMobile && (
+          {isMobile && (<>
+
             <ul className="list-group list-group-flush">
               {searchResults.map((author) => (
                 <AuthorLi author={author}></AuthorLi>
               ))}
             </ul>
+            {/* <Pagination
+              currentPage={allAuthorsPage}
+              totalPages={totalAllAuthorsPages}
+              onPageChange={setAllAuthorsPage}
+            /> */}
+          </>
+
           )}
 
           {!isMobile && (
-            <ul className="list-group list-group-flush">
-              <div className="row row-cols-1 row-cols-md-3 g-4 ">
-                {searchResults.map((author) => (
-                  <AuthorCard author={author}></AuthorCard>
-                ))}
-              </div>
-            </ul>
+            <>
+              <ul className="list-group list-group-flush">
+                <div className="row row-cols-1 row-cols-md-3 g-4 ">
+                  {searchResults.map((author) => (
+                    
+                      <AuthorCard author={author}></AuthorCard>
+
+                  ))}
+                </div>
+              </ul>
+              {/* <Pagination
+                currentPage={allAuthorsPage}
+                totalPages={totalAllAuthorsPages}
+                onPageChange={setAllAuthorsPage}
+              /> */}
+
+            </>
+
           )}
         </div>
       )}
+
 
       {loading && <LoadingSpinner />}
     </>
