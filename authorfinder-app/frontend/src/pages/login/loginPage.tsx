@@ -9,7 +9,9 @@ interface LoginProps {
   onLoginError: (error: string) => void;
 }
 
-function LoginPage({ onLoginSuccess, onLoginError }: LoginProps) {
+function LoginPage(props: LoginProps) {
+
+  const { onLoginSuccess, onLoginError } = props;
 
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -32,7 +34,7 @@ function LoginPage({ onLoginSuccess, onLoginError }: LoginProps) {
         }
 
     } catch (error) {
-      setErrorMessage(error as string);
+      setErrorMessage("There was an error to login. Please try again.");
       onLoginError(error as string);
     } finally {
       setLoading(false);
@@ -44,7 +46,7 @@ function LoginPage({ onLoginSuccess, onLoginError }: LoginProps) {
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
         <h2>Login</h2>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {errorMessage && (<div className="error-message">{errorMessage}</div>)}
         <div className="form-group">
           <label htmlFor="username">Email/Username:</label>
           <input
@@ -70,7 +72,24 @@ function LoginPage({ onLoginSuccess, onLoginError }: LoginProps) {
         <button className="login-button" type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
+        {/* <section className="text-center mt-4">
+          <p className="text-center">
+            Don't have an account?
+            <Link
+              to={"/register"}
+              className="text-decoration-none"
+              state={{
+                onLoginSuccess: onLoginSuccess,
+                onLoginError: onLoginError
+              }}
+            >
+              Sign up
+            </Link>
+
+          </p>
+        </section> */}
       </form>
+
     </div>
   )
 }

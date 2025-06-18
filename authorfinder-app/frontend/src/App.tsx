@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { NavLink, Route, Routes } from "react-router";
+import { NavLink, Route, Routes, useNavigate } from "react-router";
 // import { isMobile, BrowserView, MobileView } from 'react-device-detect';
 
 import './App.css'
@@ -7,12 +6,45 @@ import useIsMobile from './hooks/useIsMobil';
 import AuthorsPage from './pages/authorsPage';
 import LoginPage from './pages/login/loginPage';
 import RegisterPage from './pages/login/registerPage';
+import type { IAuth } from "./Auth/iauth";
+import { useEffect, useState } from "react";
+import { authServiceAPI } from "./services/auth.service";
 // import ResponsiveAppBar from './components/header/responsiveAppBar.component'
 // import ElevateAppBar from './components/header/elevationScroll.component'
 
 function App() {
 
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+
+  const [currentUser, setCurrentUser] = useState<IAuth | null>(null);
+  const [userToken, setUserToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    console.log('Component has mounted! Fetching data...');
+    const user = authServiceAPI.getCurrentUser();
+
+    if (user) {
+      setCurrentUser(user);
+    }
+  }, []);
+
+  const handleLoginSuccess = (auth: IAuth) => {
+    setUserToken(auth.accessToken);
+    // setAppError(null); // Clear any previous app-level errors
+    setCurrentUser(auth);
+    console.log('Login successful! Token:', userToken);
+
+    navigate("/authors");
+    window.location.reload();
+    // Redirect or perform other actions after login
+  };
+
+  const handleLoginError = (error: string) => {
+    setUserToken(null);
+    // setAppError(`Login failed: ${error}`);
+    console.error('Login failed:', error);
+  };
 
   function logout() {
     localStorage.removeItem('user')
@@ -71,15 +103,18 @@ function App() {
       <div className='container'>
         <Routes>
           <Route path="/" element={<h1>Welcome to Author Finder</h1>} />
+          <Route path="/index.html" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/authors" element={<AuthorsPage />} />
           <Route path="/favorites" element={<h1>My Favorites</h1>} />
-          <Route path="/register" element={<RegisterPage onLoginError={() => { }} onLoginSuccess={() => { }} />} />
-          <Route path="/login" element={<LoginPage onLoginError={() => { }} onLoginSuccess={() => { }} />} />
+          <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
+          <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/profile" element={<h1>User Profile</h1>} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
 
       </div>
+
+
     </>
   )
 }

@@ -1,5 +1,4 @@
-import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, X } from 'lucide-react';
 
 
 interface MessageBoxProps {
@@ -13,27 +12,23 @@ function MessageBox(props: MessageBoxProps) {
 
   const { message, type, onMessageBoxAction } = props;
 
-  let bgColor, textColor, icon;
+  let bgColor, icon;
 
   switch (type) {
     case 'success':
       bgColor = 'alert alert-success';
-      textColor = 'text-black';
       icon = '✅';
       break;
     case 'error':
       bgColor = 'alert alert-danger';
-      textColor = 'text-black';
       icon = <AlertCircle size={24} className="text-black" />;
       break;
     case 'info':
       bgColor = 'alert alert-primary';
-      textColor = 'text-black';
       icon = 'ℹ️';
       break;
     case 'confirm':
       bgColor = 'alert alert-warning';
-      textColor = 'text-black';
       icon = '⚠️';
       return (
         <div className={`fixed bottom-4 right-4 p-4 rounded-lg shadow-xl flex flex-col items-start gap-3 z-[100] ${bgColor} text-primary-emphasis`}>
@@ -62,7 +57,6 @@ function MessageBox(props: MessageBoxProps) {
       );
     default:
       bgColor = 'alert alert-secondary';
-      textColor = 'text-black';
       icon = '💬';
   }
 

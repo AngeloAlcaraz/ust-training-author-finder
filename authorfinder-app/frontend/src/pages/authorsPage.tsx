@@ -1,29 +1,25 @@
-import { useMemo, useRef, useState, type SyntheticEvent } from "react";
-import { Search, Heart, ListPlus, Book, Pencil, Trash2, X, AlertCircle, Sparkles } from 'lucide-react';
+import { useRef, useState, type SyntheticEvent } from "react";
+import { Search } from 'lucide-react';
 import MessageBox from "../components/share/message.component";
-import { Link } from "react-router";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
 import type { Author } from "../model/Author";
 import AuthorLi from "../components/authors/authorLi.component";
 import AuthorCard from "../components/authors/authorCard.component";
 import authorAPI from "../services/author.service";
 import useIsMobile from "../hooks/useIsMobil";
-import Pagination from "../components/share/pagination.component";
+// import Pagination from "../components/share/pagination.component";
 
 function AuthorsPage() {
 
   const isMobile = useIsMobile();
-  const authorsPerPage = 6; // Number of authors to display per page
-
-
-  const [view, setView] = useState('browse'); // 'browse', 'authorDetails', 'favorites', 'addEditFavorite', 'similarAuthors'
+  // const authorsPerPage = 6; // Number of authors to display per page
 
   const [searchResults, setSearchResults] = useState<Author[]>([]);
-  const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null); // Full author object from Open Library
-  const [authorWorks, setAuthorWorks] = useState([]);
-  const [similarAuthors, setSimilarAuthors] = useState([]); // Stores LLM-generated similar authors
-  const [currentAuthorForRec, setCurrentAuthorForRec] = useState(null); // Author name for whom recommendations are shown
-  const [allAuthorsPage, setAllAuthorsPage] = useState(1); // For pagination of all authors
+  // const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null); // Full author object from Open Library
+  // const [authorWorks, setAuthorWorks] = useState([]);
+  // const [similarAuthors, setSimilarAuthors] = useState([]); // Stores LLM-generated similar authors
+  // const [currentAuthorForRec, setCurrentAuthorForRec] = useState(null); // Author name for whom recommendations are shown
+  // const [allAuthorsPage, setAllAuthorsPage] = useState(1); // For pagination of all authors
 
   const [message, setMessage] = useState(''); // For message box
   const [messageType, setMessageType] = useState('info'); // 'info', 'error', 'success', 'confirm'
@@ -34,10 +30,10 @@ function AuthorsPage() {
 
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
+  // const [error, setError] = useState<string | undefined>(undefined);
 
   const [searchText, setSearchText] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
 
   const handleSearch = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -48,10 +44,10 @@ function AuthorsPage() {
 
     setLoading(true);
     setSearchResults([]);
-    setSelectedAuthor(null);
-    setAuthorWorks([]);
-    setSimilarAuthors([]); // Clear recommendations
-    setCurrentAuthorForRec(null); // Clear recommendations target
+    // setSelectedAuthor(null);
+    // setAuthorWorks([]);
+    // setSimilarAuthors([]); // Clear recommendations
+    // setCurrentAuthorForRec(null); // Clear recommendations target
 
     //Call data service to search authors by name
     try {
@@ -66,38 +62,37 @@ function AuthorsPage() {
       showMessage('Failed to search authors. Please check your internet connection or try again later.', 'error');
     } finally {
       setLoading(false);
-      setView('browse');
     }
   };
 
   //! Service to fetch author by id, this should be work for details page 
-  const fetchAuthorDetails = async (authorKey: any) => {
-    setLoading(true);
-    try {
-      // Fetch author details
-      // const authorResponse = await fetch(`https://openlibrary.org/authors/${authorKey}.json`);
-      // if (!authorResponse.ok) throw new Error(`Failed to fetch author details: ${authorResponse.status}`);
-      // const authorData = await authorResponse.json();
-      // console.log("Author Data:", authorData);
+  // const fetchAuthorDetails = async (authorKey: any) => {
+  //   setLoading(true);
+  //   try {
+  //     // Fetch author details
+  //     // const authorResponse = await fetch(`https://openlibrary.org/authors/${authorKey}.json`);
+  //     // if (!authorResponse.ok) throw new Error(`Failed to fetch author details: ${authorResponse.status}`);
+  //     // const authorData = await authorResponse.json();
+  //     // console.log("Author Data:", authorData);
 
 
-      // // Fetch author's works
-      // const worksResponse = await fetch(`https://openlibrary.org/authors/${authorKey}/works.json`);
-      // if (!worksResponse.ok) throw new Error(`Failed to fetch author works: ${worksResponse.status}`);
-      // const worksData = await worksResponse.json();
+  //     // // Fetch author's works
+  //     // const worksResponse = await fetch(`https://openlibrary.org/authors/${authorKey}/works.json`);
+  //     // if (!worksResponse.ok) throw new Error(`Failed to fetch author works: ${worksResponse.status}`);
+  //     // const worksData = await worksResponse.json();
 
-      const data = await authorAPI.getAuthorById(authorKey);
-      setAuthorWorks(data);
-      //! deberia navegarse a la pagina de detalles del autor
-      //setView('authorDetails');
-    } catch (error) {
-      console.error("Error fetching author details/works:", error);
-      showMessage('Failed to load author details and books. Please try again.', 'error');
-      setView('browse'); // Go back to browse if details fail
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     const data = await authorAPI.getAuthorById(authorKey);
+  //     setAuthorWorks(data);
+  //     //! deberia navegarse a la pagina de detalles del autor
+  //     //setView('authorDetails');
+  //   } catch (error) {
+  //     console.error("Error fetching author details/works:", error);
+  //     showMessage('Failed to load author details and books. Please try again.', 'error');
+  //     setView('browse'); // Go back to browse if details fail
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
 
 
@@ -126,15 +121,15 @@ function AuthorsPage() {
     }
   };
 
-  const paginatedAllAuthors = useMemo(() => {
-    const startIndex = (allAuthorsPage - 1) * authorsPerPage;
-    const endIndex = startIndex + authorsPerPage;
-    return searchResults.slice(startIndex, endIndex);
-  }, [allAuthorsPage]);
+  // const paginatedAllAuthors = useMemo(() => {
+  //   const startIndex = (allAuthorsPage - 1) * authorsPerPage;
+  //   const endIndex = startIndex + authorsPerPage;
+  //   return searchResults.slice(startIndex, endIndex);
+  // }, [allAuthorsPage]);
 
-  const totalAllAuthorsPages = useMemo(() => {
-    return Math.ceil(searchResults.length / authorsPerPage);
-  }, []);
+  // const totalAllAuthorsPages = useMemo(() => {
+  //   return Math.ceil(searchResults.length / authorsPerPage);
+  // }, []);
 
   return (
     <>
@@ -204,8 +199,8 @@ function AuthorsPage() {
               <ul className="list-group list-group-flush">
                 <div className="row row-cols-1 row-cols-md-3 g-4 ">
                   {searchResults.map((author) => (
-                    
-                      <AuthorCard author={author}></AuthorCard>
+
+                    <AuthorCard author={author}></AuthorCard>
 
                   ))}
                 </div>

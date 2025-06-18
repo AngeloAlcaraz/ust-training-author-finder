@@ -1,7 +1,7 @@
 import type { Author } from "../model/Author";
 
 const baseUrl = "https://openlibrary.org/";
-const authorsUrl = `${baseUrl}authors`;
+// const authorsUrl = `${baseUrl}authors`;
 const searchUrl = `${baseUrl}search/authors.json?q=`;
 
 const authorAPI = {

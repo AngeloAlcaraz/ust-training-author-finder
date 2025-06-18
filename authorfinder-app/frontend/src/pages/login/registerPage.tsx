@@ -3,13 +3,17 @@ import { authServiceAPI } from "../../services/auth.service";
 import type { IAuth } from "../../Auth/iauth";
 import { Auth } from "../../Auth/auth";
 import { LoginErroMessage } from "../../Auth/loginErrorMessage";
+import { useLocation } from "react-router-dom";
 
 interface LoginProps {
   onLoginSuccess: (auth: IAuth) => void;
   onLoginError: (error: string) => void;
 }
 
-function RegisterPage({ onLoginSuccess, onLoginError }: LoginProps) {
+function RegisterPage(props: LoginProps) {
+
+  const location = useLocation();
+  const { onLoginSuccess, onLoginError } = props || location.state || {};
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [name, setName] = useState<string>('');
