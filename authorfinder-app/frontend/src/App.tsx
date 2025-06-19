@@ -63,7 +63,7 @@ function App() {
 
 
   return (
-    <>
+    <div className="container">
       <header className="App-header sticky-top ">
         <nav className="navbar sticky-top   navbar-expand-lg bg-body-tertiary ">
           <div className="container-fluid">
@@ -125,8 +125,10 @@ function App() {
 
       </div>
 
-
-    </>
+      <footer className="App-footer">
+        <p>&copy; 2025 AuthorFinder. All rights reserved.</p>
+      </footer>
+    </div>
   )
 }
 
