@@ -26,7 +26,7 @@ function RegisterPage(props: LoginProps) {
     setErrorMessage(null);
 
     try {
-      const response = await authServiceAPI.register(name, email, password);
+      const response = await authServiceAPI.register(name, email, password, "male");
       if (response instanceof Auth)
         onLoginSuccess(response);
       else

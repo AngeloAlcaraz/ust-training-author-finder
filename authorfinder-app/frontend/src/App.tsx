@@ -50,9 +50,9 @@ function App() {
   };
 
   function logout() {
-    localStorage.removeItem('user')
-    //  authServiceAPI.logout();
-    // setCurrentUser(null);
+    //localStorage.removeItem('user')
+    authServiceAPI.logout();
+    setCurrentUser(null);
   }
 
   function handleAddFavorite(author: any) {
