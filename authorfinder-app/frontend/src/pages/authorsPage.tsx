@@ -149,7 +149,10 @@ function AuthorsPage(props: AuthorsPageProps) {
 
             <ul className="list-group list-group-flush">
               {searchResults.map((author) => (
-                <AuthorLi author={author} onfavorite={onAddFavorite}></AuthorLi>
+                <li key={author.key} className="list-group-item">
+                  <AuthorLi author={author} onfavorite={onAddFavorite}></AuthorLi>
+                </li>
+
               ))}
             </ul>
             {/* <Pagination

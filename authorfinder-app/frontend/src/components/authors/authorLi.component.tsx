@@ -11,7 +11,7 @@ function AuthorLi(props: AuthorLiProps) {
   const { author, onfavorite }: AuthorLiProps = props;
 
   return (
-    <li key={author.key} className="list-group-item">
+    <>
       <div className="d-flex w-100 justify-content-between">
         <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
           <div className="d-flex align-items-center gap-3">
@@ -42,7 +42,7 @@ function AuthorLi(props: AuthorLiProps) {
 
         <small>View details...</small>
       </Link>
-    </li>
+    </>
   );
 
 }

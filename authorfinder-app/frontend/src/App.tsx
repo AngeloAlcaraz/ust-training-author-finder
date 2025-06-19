@@ -10,8 +10,6 @@ import type { IAuth } from "./Auth/iauth";
 import { useEffect, useState } from "react";
 import { authServiceAPI } from "./services/auth.service";
 import AuthorPage from "./pages/authorPage";
-// import ResponsiveAppBar from './components/header/responsiveAppBar.component'
-// import ElevateAppBar from './components/header/elevationScroll.component'
 
 function App() {
 
