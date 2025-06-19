@@ -52,7 +52,8 @@ describe('FavoritesController', () => {
         addedBy: 'user1',
         authorId: 'author1',
         name: 'Mark Twain',
-        addedAt: ''
+        addedAt: '',
+        birthDate: '1980-01-01'
       };
 
       mockFavoritesService.create.mockResolvedValue(dto);
