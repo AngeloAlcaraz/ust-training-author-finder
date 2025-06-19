@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import * as Joi from "joi";
 import { AuthController } from "src/controllers/auth.controller";
+import { FavoritesProxyController } from "src/controllers/favorites.controller";
 import { AuthService } from "src/services/auth.service";
 import { UserService } from "src/services/user.service";
 import { AccessTokenStrategy } from "src/strategies/accessToken.strategy";
@@ -22,6 +23,8 @@ import { RefreshTokenStrategy } from "src/strategies/refreshToken.strategy";
                 JWT_ACCESS_EXPIRATION_TIME: Joi.string().required(),
                 JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
                 PORT: Joi.number().default(4000),
+                USER_SERVICE_URL: Joi.string().uri().required(),
+                FAVORITE_SERVICE_URL: Joi.string().uri().required(),
             }),
             validationOptions: {
                 abortEarly: false,  // Do not stop validation on the first error
@@ -29,7 +32,7 @@ import { RefreshTokenStrategy } from "src/strategies/refreshToken.strategy";
             },
         }),
     ],
-    controllers: [AuthController],
+    controllers: [AuthController, FavoritesProxyController],
     providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, UserService],
     exports: [], // Export any providers or modules that need to be used in other modules
 })

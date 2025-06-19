@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { CustomAxiosInstance } from "src/api/CustomAxiosInstance";
 
 @Injectable()
 export class UserService {
     private api: CustomAxiosInstance;
 
-    constructor() {
-        this.api = new CustomAxiosInstance("http://localhost:4001/api/v1");
+    constructor(private readonly configService: ConfigService) {
+        this.api = new CustomAxiosInstance(configService.getOrThrow<string>('USER_SERVICE_URL'));
     }
 
     setTokens(accessToken: string, refreshToken: string) {
