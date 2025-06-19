@@ -19,10 +19,9 @@ function AuthorCard(props: AuthorLiProps) {
               <div className="d-flex align-items-center gap-3">
                 <img
                   src={`https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`}
-                  // src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOVriLPru6AjmM5u0mjgJA67XQfeM27a1gAA&s`}
 
                   alt={author.name}
-                  className="img-fluid"
+                  className="img-thumbnail img-fluid"
                 />
                 <h5 className="mb-1 font-semibold">{author.name}</h5>
               </div>

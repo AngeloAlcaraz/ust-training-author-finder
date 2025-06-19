@@ -2,6 +2,9 @@ export class Author {
   key: string = "";
   name: string = "";
   top_work?: string = undefined;
+  birth_date: any;
+  death_date: any;
+  bio: any;
   // Add other properties as needed
 
   constructor(initializer?: any) {

@@ -9,6 +9,7 @@ import RegisterPage from './pages/login/registerPage';
 import type { IAuth } from "./Auth/iauth";
 import { useEffect, useState } from "react";
 import { authServiceAPI } from "./services/auth.service";
+import AuthorPage from "./pages/authorPage";
 // import ResponsiveAppBar from './components/header/responsiveAppBar.component'
 // import ElevateAppBar from './components/header/elevationScroll.component'
 
@@ -26,6 +27,9 @@ function App() {
 
     if (user) {
       setCurrentUser(user);
+    }
+    else {
+      console.log('No user found in local storage.');
     }
   }, []);
 
@@ -105,6 +109,7 @@ function App() {
           <Route path="/" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/index.html" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/authors" element={<AuthorsPage />} />
+          <Route path="/authors/:authorId" element={<AuthorPage />} />
           <Route path="/favorites" element={<h1>My Favorites</h1>} />
           <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />

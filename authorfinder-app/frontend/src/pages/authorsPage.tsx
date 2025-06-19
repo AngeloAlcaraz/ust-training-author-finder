@@ -15,11 +15,6 @@ function AuthorsPage() {
   // const authorsPerPage = 6; // Number of authors to display per page
 
   const [searchResults, setSearchResults] = useState<Author[]>([]);
-  // const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null); // Full author object from Open Library
-  // const [authorWorks, setAuthorWorks] = useState([]);
-  // const [similarAuthors, setSimilarAuthors] = useState([]); // Stores LLM-generated similar authors
-  // const [currentAuthorForRec, setCurrentAuthorForRec] = useState(null); // Author name for whom recommendations are shown
-  // const [allAuthorsPage, setAllAuthorsPage] = useState(1); // For pagination of all authors
 
   const [message, setMessage] = useState(''); // For message box
   const [messageType, setMessageType] = useState('info'); // 'info', 'error', 'success', 'confirm'
@@ -44,10 +39,6 @@ function AuthorsPage() {
 
     setLoading(true);
     setSearchResults([]);
-    // setSelectedAuthor(null);
-    // setAuthorWorks([]);
-    // setSimilarAuthors([]); // Clear recommendations
-    // setCurrentAuthorForRec(null); // Clear recommendations target
 
     //Call data service to search authors by name
     try {
@@ -64,37 +55,6 @@ function AuthorsPage() {
       setLoading(false);
     }
   };
-
-  //! Service to fetch author by id, this should be work for details page 
-  // const fetchAuthorDetails = async (authorKey: any) => {
-  //   setLoading(true);
-  //   try {
-  //     // Fetch author details
-  //     // const authorResponse = await fetch(`https://openlibrary.org/authors/${authorKey}.json`);
-  //     // if (!authorResponse.ok) throw new Error(`Failed to fetch author details: ${authorResponse.status}`);
-  //     // const authorData = await authorResponse.json();
-  //     // console.log("Author Data:", authorData);
-
-
-  //     // // Fetch author's works
-  //     // const worksResponse = await fetch(`https://openlibrary.org/authors/${authorKey}/works.json`);
-  //     // if (!worksResponse.ok) throw new Error(`Failed to fetch author works: ${worksResponse.status}`);
-  //     // const worksData = await worksResponse.json();
-
-  //     const data = await authorAPI.getAuthorById(authorKey);
-  //     setAuthorWorks(data);
-  //     //! deberia navegarse a la pagina de detalles del autor
-  //     //setView('authorDetails');
-  //   } catch (error) {
-  //     console.error("Error fetching author details/works:", error);
-  //     showMessage('Failed to load author details and books. Please try again.', 'error');
-  //     setView('browse'); // Go back to browse if details fail
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
 
   const handleMessageBoxAction = (action: string) => {
     setShowMessageBox(false);
@@ -155,7 +115,7 @@ function AuthorsPage() {
 
                 <button
                   type="submit"
-                  className="btn btn-outline-secondary btn-sm"
+                  className="btn btn-outline-primary btn-sm"
                   disabled={loading}
                 >
                   {loading ? 'Searching...' : <><Search size={20} /> Search</>}
