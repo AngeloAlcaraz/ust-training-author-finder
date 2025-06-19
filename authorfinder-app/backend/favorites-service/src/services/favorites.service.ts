@@ -23,8 +23,14 @@ export class FavoritesService {
         throw error;
       }
     }
+
+    const message = {
+      type: 'AddFavorite',
+      ...createFavoriteDto,
+    };
+
     try {
-      await this.favoritesQueueService.enqueueFavorite(createFavoriteDto);
+      await this.favoritesQueueService.enqueueFavorite(message);
     } catch (error) {
       console.error('Error sending message to the queue:', error);
       throw new ConflictException('Error sending message to the queue');
@@ -35,7 +41,6 @@ export class FavoritesService {
       message: 'Favorite is being processed asynchronously',
     };
   }
-
 
   async findByUserId(userId: string): Promise<any[]> {
     const result = await this.ddbDocClient.send(
@@ -93,13 +98,16 @@ export class FavoritesService {
       }
       throw error;
     }
+
+    const message = {
+      type: 'RemoveFavorite',
+      addedBy,
+      authorId,
+      timestamp: new Date().toISOString(),
+    };
+
     try {
-      await this.favoritesQueueService.enqueueFavorite({
-        type: 'RemoveFavorite',
-        addedBy,
-        authorId,
-        timestamp: new Date().toISOString(),
-      });
+      await this.favoritesQueueService.enqueueFavorite(message);
     } catch (error) {
       console.error('Error sending delete message to the queue:', error);
       throw new ConflictException('Error sending delete message to the queue');
