@@ -41,12 +41,12 @@ function parseJSON(response: Response) {
 }
 
 function convertToAuthtModel(item: any): IAuth | LoginErroMessage {
-  if (item.accessToken) return new Auth(item);
+  if (item.data.accessToken) return new Auth(item);
   else return new LoginErroMessage(item);
 }
 
 function saveToLocalStorage(user: any): IAuth | LoginErroMessage {
-  if (user.accessToken) {
+  if (user.data.accessToken) {
     localStorage.setItem("user", JSON.stringify(user));
   }
 
