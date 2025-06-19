@@ -31,7 +31,7 @@ const swaggerUIOptions: SwaggerCustomOptions = {
     customCssUrl: [],
 };
 
-export const ConfigureSwaggerUI = (app: INestApplication<any>) => {
+export const ConfigureSwaggerUI = async (app: INestApplication<any>) => {
     const document = SwaggerModule.createDocument(app, documentConfig);
     SwaggerModule.setup('api', app, document, swaggerUIOptions);
 }

@@ -67,13 +67,15 @@ export class AuthService {
             password: hashedPassword,
         });
 
+        const tokens = await this.getTokens(newUser.userId, newUser.name, newUser.email);
+        await this.updateRefreshToken(newUser.userId, tokens.refreshToken);
+
         return {
             userId: newUser.userId,
             name: newUser.name,
             email: newUser.email,
             gender: newUser.gender,
-            accessToken: '', // Placeholder, remove when user service is ready
-            refreshToken: '', // Placeholder, remove when user service is ready
+            ...tokens,
         };
     }
 
