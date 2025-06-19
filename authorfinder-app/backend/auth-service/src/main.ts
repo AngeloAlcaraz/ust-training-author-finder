@@ -12,6 +12,11 @@ async function bootstrap() {
     { abortOnError: false } // Prevent Nest from crashing on unhandled exceptions, delete this line if you want the default behavior
   );
 
+  app.enableCors({
+    origin: CORS_ORIGIN,
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
   ConfigureSwaggerUI(app);
   await app.listen(PORT, () => {
     console.log(`🚀 Auth service is running on port ${PORT}`);
