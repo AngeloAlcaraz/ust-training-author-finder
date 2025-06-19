@@ -1,52 +1,66 @@
 import { Link } from "react-router";
 import type { Author } from "../../model/Author";
+import { FiHeart as Heart } from "react-icons/fi";
+import type { SyntheticEvent } from "react";
 
 
-interface AuthorLiProps {
+interface AuthorCardProps {
   author: Author;
+  onfavorite: (author: Author) => void;
 }
 
-function AuthorCard(props: AuthorLiProps) {
-  const { author }: AuthorLiProps = props;
+function AuthorCard(props: AuthorCardProps) {
+  const { author, onfavorite }: AuthorCardProps = props;
+
+  function handleAddFavorite(event: SyntheticEvent): void {
+    event.preventDefault();
+    if (onfavorite) {
+      onfavorite(author);
+    }
+
+  }
 
   return (
-    <div className="col" key={author.key}>
-      <div className="card h-100">
+    // <div className="col" key={author.key}>
+    <div className="card h-100">
 
-        <div className="card-body">
-          <div className="d-flex w-100 justify-content-between">
-            <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
-              <div className="d-flex align-items-center gap-3">
-                <img
-                  src={`https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`}
-
-                  alt={author.name}
-                  className="img-thumbnail img-fluid"
-                />
-                <h5 className="mb-1 font-semibold">{author.name}</h5>
-              </div>
-            </Link>
-            <small>
-              <button className="btn btn-outline-danger btn-md text-decoration-none">
-                {/* <span className="bi bi-heart-fill"></span> */}
-                <span className="bi bi-heart"></span>
-
-              </button>
-            </small>
-          </div>
-
+      <div className="card-body">
+        <div className="d-flex w-100 justify-content-between">
           <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
+            <div className="d-flex align-items-center gap-3">
+              <img
+                src={`https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`}
 
-            {author.top_work && (
-              <p ><strong>Top Work:</strong> {author.top_work}</p>
-            )}
+                alt={author.name}
+                className="img-thumbnail img-fluid"
+              />
+              <h5 className="mb-1 font-semibold">{author.name}</h5>
 
-            <small>View details...</small>
+            </div>
           </Link>
+          <small>
+            <button
+              className="btn btn-outline-danger btn-md text-decoration-none"
+              onClick={handleAddFavorite}>
+              {/* <span className="bi bi-heart-fill"></span> */}
+              <span className=""><Heart size={20} /></span>
 
+            </button>
+          </small>
         </div>
+
+        <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
+
+          {author.top_work && (
+            <p ><strong>Top Work:</strong> {author.top_work}</p>
+          )}
+
+          <small>View details...</small>
+        </Link>
+
       </div>
     </div>
+    // </div>
   );
 }
 

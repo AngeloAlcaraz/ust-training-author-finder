@@ -9,7 +9,14 @@ import authorAPI from "../services/author.service";
 import useIsMobile from "../hooks/useIsMobil";
 // import Pagination from "../components/share/pagination.component";
 
-function AuthorsPage() {
+interface AuthorsPageProps {
+  onAddFavorite: (author: Author) => void;
+}
+
+
+function AuthorsPage(props: AuthorsPageProps) {
+
+  const { onAddFavorite } = props;
 
   const isMobile = useIsMobile();
   // const authorsPerPage = 6; // Number of authors to display per page
@@ -142,7 +149,7 @@ function AuthorsPage() {
 
             <ul className="list-group list-group-flush">
               {searchResults.map((author) => (
-                <AuthorLi author={author}></AuthorLi>
+                <AuthorLi author={author} onfavorite={onAddFavorite}></AuthorLi>
               ))}
             </ul>
             {/* <Pagination
@@ -159,9 +166,9 @@ function AuthorsPage() {
               <ul className="list-group list-group-flush">
                 <div className="row row-cols-1 row-cols-md-3 g-4 ">
                   {searchResults.map((author) => (
-
-                    <AuthorCard author={author}></AuthorCard>
-
+                    <div className="col" key={author.key}>
+                      <AuthorCard author={author} onfavorite={onAddFavorite}></AuthorCard>
+                    </div>
                   ))}
                 </div>
               </ul>

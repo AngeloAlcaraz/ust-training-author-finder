@@ -56,6 +56,13 @@ function App() {
     // setCurrentUser(null);
   }
 
+  function handleAddFavorite(author: any) {
+    console.log("Adding author to favorites:", author);
+    // Implement the logic to add the author to favorites
+    // This could involve calling an API or updating local state
+  }
+
+
   return (
     <>
       <header className="App-header sticky-top ">
@@ -108,8 +115,8 @@ function App() {
         <Routes>
           <Route path="/" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/index.html" element={<h1>Welcome to Author Finder</h1>} />
-          <Route path="/authors" element={<AuthorsPage />} />
-          <Route path="/authors/:authorId" element={<AuthorPage />} />
+          <Route path="/authors" element={<AuthorsPage onAddFavorite={handleAddFavorite} />} />
+          <Route path="/authors/:authorId" element={<AuthorPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/favorites" element={<h1>My Favorites</h1>} />
           <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />

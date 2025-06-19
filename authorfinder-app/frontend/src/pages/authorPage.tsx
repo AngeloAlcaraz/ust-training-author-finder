@@ -7,7 +7,14 @@ import type { Auth } from "../Auth/auth";
 import { FiHeart as Heart } from "react-icons/fi";
 import useIsMobile from "../hooks/useIsMobil";
 
-function AuthorPage() {
+interface AuthorPageProps {
+  onAddFavorite?: (author: Author) => void;
+}
+
+function AuthorPage(props: AuthorPageProps) {
+
+  const { onAddFavorite } = props;
+
   const [loading, setLoading] = useState(false);
   const [author, setAuthor] = useState<Author | null>(null);
   const [authorWorks, setAuthorWorks] = useState<any[]>([]);
@@ -42,7 +49,13 @@ function AuthorPage() {
   }, [id]);
 
   function handleAddFavoriteFromAPI(event: SyntheticEvent): void {
-    console.log("Adding author to favorites:", author);
+    // console.log("Adding author to favorites:", author);
+    event.preventDefault();
+    setLoading(true);
+    if (onAddFavorite) {
+      onAddFavorite(author as Author);
+    }
+    setLoading(false);
   }
 
   return (
@@ -81,7 +94,7 @@ function AuthorPage() {
                           {!isMobil ? (
                             <button
                               onClick={handleAddFavoriteFromAPI}
-                              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition duration-300 flex items-center gap-2"
+                              className="btn btn-outline-danger btn-md "
                               disabled={loading}
                             >
                               {loading ? 'Adding...' : <><Heart size={20} /> Add to Favorites</>}
@@ -90,7 +103,7 @@ function AuthorPage() {
                             : (
                               <button
                                 onClick={handleAddFavoriteFromAPI}
-                                className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition duration-300 flex items-center gap-2"
+                                className="btn btn-outline-danger btn-sm "
                                 disabled={loading}
                               >
                                 {loading ? 'Adding...' : <><Heart size={20} /> </>}
@@ -101,15 +114,11 @@ function AuthorPage() {
                         </small>
                       </div>
 
-
-
-
                     </div>
                     <div className="flex justify-between items-center mb-4">
                       <h2 className="text-3xl font-extrabold text-gray-800">
                         {author.name}
                       </h2>
-
                     </div>
 
                     {author.birth_date && (
@@ -140,7 +149,7 @@ function AuthorPage() {
                   <h3 className="fs-4">Works by {author.name}</h3>
                 </li>
                 {authorWorks.map((work) => (
-                  <li key={author.key} className="list-group-item">
+                  <li key={work.key} className="list-group-item">
                     <div className="card">
                       <div className="card-body">
                         <p className="fs-5">{work.title}</p>
@@ -155,7 +164,6 @@ function AuthorPage() {
                       </div>
 
                     </div>
-
                   </li>
                 ))}
               </ul>

@@ -3,11 +3,12 @@ import type { Author } from "../../model/Author";
 
 interface AuthorLiProps {
   author: Author;
+  onfavorite: (author: Author) => void;
 }
 
 function AuthorLi(props: AuthorLiProps) {
 
-  const { author }: AuthorLiProps = props;
+  const { author, onfavorite }: AuthorLiProps = props;
 
   return (
     <li key={author.key} className="list-group-item">
