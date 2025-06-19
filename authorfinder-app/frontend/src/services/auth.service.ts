@@ -3,7 +3,7 @@ import type { IAuth } from "../Auth/iauth";
 import { LoginErroMessage } from "../Auth/loginErrorMessage";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const API_URL = "http://localhost:3000/auth";
+const API_URL = "http://localhost:4000/auth";
 
 function translateStatusToErrorMessage(status: number) {
   switch (status) {
