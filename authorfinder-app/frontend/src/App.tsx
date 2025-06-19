@@ -87,7 +87,7 @@ function App() {
                     <ul className="dropdown-menu">
                       <li><NavLink to="/register" className="nav-link active">Sign up</NavLink></li>
                       <li><NavLink to="/login" className="nav-link active">Sign in</NavLink></li>
-                      <li><NavLink to="/profile" className="nav-link active">Profile</NavLink></li>
+                      {/* <li><NavLink to="/profile" className="nav-link active">Profile</NavLink></li> */}
                       <li><NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink></li>
                     </ul>
                   </li>
@@ -101,7 +101,7 @@ function App() {
                 <NavLink to="/login" className="nav-link active">Sign in</NavLink>
                 <NavLink to="/register" className="nav-link active">Sign up</NavLink>
 
-                <NavLink to="/profile" className="nav-link active">Profile</NavLink>
+                {/* <NavLink to="/profile" className="nav-link active">Profile</NavLink> */}
                 <NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink>
               </div>
             )}
@@ -113,13 +113,13 @@ function App() {
       <div className='container'>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/index.html" element={<h1>Welcome to Author Finder</h1>} />
+          <Route path="/index.html" element={<HomePage />} />
           <Route path="/authors" element={<AuthorsPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/authors/:authorId" element={<AuthorPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/favorites" element={<h1>My Favorites</h1>} />
           <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
-          <Route path="/profile" element={<h1>User Profile</h1>} />
+          {/* <Route path="/profile" element={<h1>User Profile</h1>} /> */}
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
 
