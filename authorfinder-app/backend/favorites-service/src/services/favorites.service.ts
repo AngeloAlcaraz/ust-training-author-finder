@@ -24,20 +24,20 @@ export class FavoritesService {
       }
     }
 
-    const message = {
+    const payload = {
       type: 'AddFavorite',
       ...createFavoriteDto,
     };
 
     try {
-      await this.favoritesQueueService.enqueueFavorite(message);
+      await this.favoritesQueueService.enqueueFavorite(payload);
     } catch (error) {
       console.error('Error sending message to the queue:', error);
       throw new ConflictException('Error sending message to the queue');
     }
 
     return {
-      ...createFavoriteDto,
+      ...payload,
       message: 'Favorite is being processed asynchronously',
     };
   }

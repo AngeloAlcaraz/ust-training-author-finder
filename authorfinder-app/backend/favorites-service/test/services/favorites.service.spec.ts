@@ -11,9 +11,9 @@ describe('FavoritesService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    jest.spyOn(console, 'error').mockImplementation(() => { });
-    jest.spyOn(console, 'log').mockImplementation(() => { });
-    jest.spyOn(console, 'warn').mockImplementation(() => { });
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     mockDdbDocClientSend = jest.fn();
 
@@ -40,8 +40,12 @@ describe('FavoritesService', () => {
       const result = await service.create(dto);
 
       expect(mockDdbDocClientSend).toHaveBeenCalledWith(expect.any(GetCommand));
-      expect(mockFavoritesQueueService.enqueueFavorite).toHaveBeenCalledWith(dto);
+      expect(mockFavoritesQueueService.enqueueFavorite).toHaveBeenCalledWith({
+        type: 'AddFavorite',
+        ...dto,
+      });
       expect(result).toEqual({
+        type: 'AddFavorite',
         ...dto,
         message: 'Favorite is being processed asynchronously',
       });
@@ -122,7 +126,6 @@ describe('FavoritesService', () => {
 
   describe('deleteById', () => {
     it('should enqueue remove favorite message if favorite exists', async () => {
-      // findById resuelve -> favorito existe
       mockDdbDocClientSend.mockResolvedValueOnce({ Item: { addedBy: 'u1', authorId: 'a1' } });
       (mockFavoritesQueueService.enqueueFavorite as jest.Mock).mockResolvedValue(undefined);
 
@@ -138,18 +141,17 @@ describe('FavoritesService', () => {
       );
     });
 
-    it('should throw NotFoundException if favorite does not exist', async () => {      
+    it('should throw NotFoundException if favorite does not exist', async () => {
       mockDdbDocClientSend.mockRejectedValueOnce(new NotFoundException());
 
       await expect(service.deleteById('u1', 'a1')).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw ConflictException if enqueue fails', async () => {     
+    it('should throw ConflictException if enqueue fails', async () => {
       mockDdbDocClientSend.mockResolvedValueOnce({ Item: { addedBy: 'u1', authorId: 'a1' } });
       (mockFavoritesQueueService.enqueueFavorite as jest.Mock).mockRejectedValue(new Error('fail'));
 
       await expect(service.deleteById('u1', 'a1')).rejects.toThrow(ConflictException);
     });
   });
-
 });
