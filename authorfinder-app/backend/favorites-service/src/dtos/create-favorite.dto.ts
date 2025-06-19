@@ -1,8 +1,6 @@
 import {
   IsString,
-  IsArray,
   IsOptional,
-  IsNumber,
   IsDateString,
   IsNotEmpty,
 } from 'class-validator';
@@ -19,15 +17,15 @@ export class CreateFavoriteDto {
   @IsNotEmpty({ message: 'name is required' })
   name: string;
 
-  @ApiPropertyOptional({ example: ['Samuel Langhorne Clemens', 'S.L. Clemens'] })
-  @IsArray()
+  @ApiPropertyOptional({ example: 'https://example.com/image.jpg' })
+  @IsString()
   @IsOptional()
-  alternateNames?: string[];
+  imageUrl?: string;
 
-  @ApiPropertyOptional({ example: '1835-11-30' })
+  @ApiProperty({ example: '1835-11-30' })
   @IsString()
   @IsNotEmpty({ message: 'birthDate is required' })
-  birthDate?: string;
+  birthDate: string;
 
   @ApiPropertyOptional({ example: '1910-04-21' })
   @IsString()
@@ -38,26 +36,6 @@ export class CreateFavoriteDto {
   @IsString()
   @IsOptional()
   topWork?: string;
-
-  @ApiPropertyOptional({ example: ['American literature', 'Humorists, American'] })
-  @IsArray()
-  @IsOptional()
-  topSubjects?: string[];
-
-  @ApiPropertyOptional({ example: 42 })
-  @IsNumber()
-  @IsOptional()
-  workCount?: number;
-
-  @ApiPropertyOptional({ example: 4.5 })
-  @IsNumber()
-  @IsOptional()
-  ratingsAverage?: number;
-
-  @ApiPropertyOptional({ example: 1234 })
-  @IsNumber()
-  @IsOptional()
-  ratingsCount?: number;
 
   @ApiProperty({ example: 'user_123' })
   @IsString()

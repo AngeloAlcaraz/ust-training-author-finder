@@ -9,8 +9,8 @@ export class Favorite extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop([String])
-  alternateNames: string[];
+  @Prop()
+  imageUrl: string;
 
   @Prop()
   birthDate: string;
@@ -20,18 +20,6 @@ export class Favorite extends Document {
 
   @Prop()
   topWork: string;
-
-  @Prop([String])
-  topSubjects: string[];
-
-  @Prop()
-  workCount: number;
-
-  @Prop()
-  ratingsAverage: number;
-
-  @Prop()
-  ratingsCount: number;
 
   @Prop({ required: true })
   addedBy: string;
