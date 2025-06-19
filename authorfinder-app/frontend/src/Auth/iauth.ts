@@ -1,8 +1,10 @@
-export interface IAuth{
-  id: string;
-  email: string;
-  name: string;
-  accessToken: string;
-  refreshToken: string;
+export interface IAuth {
+  message: string;
+  data: {
+    id: string;
+    email: string;
+    name: string;
+    accessToken: string;
+    refreshToken: string;
+  };
 }
-

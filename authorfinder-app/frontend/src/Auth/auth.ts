@@ -2,18 +2,26 @@
 import type { IAuth } from "./iauth";
 
 export class Auth implements IAuth {
-  id: string = "";
-  email: string = "";
-  name: string = "";
-  accessToken: string = "";
-  refreshToken: string = "";
+  message: string = " ";
+  data: {
+    id: string;
+    email: string;
+    name: string;
+    accessToken: string;
+    refreshToken: string;
+  } = {
+    id: "",
+    email: "",
+    name: "",
+    accessToken: "",
+    refreshToken: "",
+  };
 
   constructor(initializer: any) {
     if (!initializer) return;
-    if (initializer.id) this.id = initializer.id;
-    if (initializer.email) this.email = initializer.email;
-    if (initializer.name) this.name = initializer.name;
-    if (initializer.accessToken) this.accessToken = initializer.accessToken;
-    if (initializer.refreshToken) this.refreshToken = initializer.refreshToken;
+    if (initializer.message) this.message = initializer.message;
+    if (initializer.data !== undefined) {
+      this.data = initializer.data;
+    }
   }
 }

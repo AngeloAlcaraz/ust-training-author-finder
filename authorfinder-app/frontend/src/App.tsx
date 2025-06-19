@@ -33,7 +33,7 @@ function App() {
   }, []);
 
   const handleLoginSuccess = (auth: IAuth) => {
-    setUserToken(auth.accessToken);
+    setUserToken(auth.data.accessToken);
     // setAppError(null); // Clear any previous app-level errors
     setCurrentUser(auth);
     console.log('Login successful! Token:', userToken);
@@ -73,22 +73,34 @@ function App() {
             </button>
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav">
-                <li className="nav-item">
-                  <NavLink to="/authors" className="nav-link active">Explore Authors</NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink to="/favorites" className="nav-link active">Favorites</NavLink>
-                </li>
+                {currentUser && (
+                  <>
+                    <li className="nav-item">
+                      <NavLink to="/authors" className="nav-link active">Explore Authors</NavLink>
+                    </li>
+                    <li className="nav-item">
+                      <NavLink to="/favorites" className="nav-link active">Favorites</NavLink>
+                    </li>
+                  </>
+                )}
+
                 {isMobile && (
                   <li className="nav-item dropdown ">
                     <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       User
                     </a>
                     <ul className="dropdown-menu">
-                      <li><NavLink to="/register" className="nav-link active">Sign up</NavLink></li>
-                      <li><NavLink to="/login" className="nav-link active">Sign in</NavLink></li>
-                      {/* <li><NavLink to="/profile" className="nav-link active">Profile</NavLink></li> */}
-                      <li><NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink></li>
+                      {currentUser ? (
+                        <>
+                          {/* <li><NavLink to="/profile" className="nav-link active">Profile</NavLink></li> */}
+                          <li><NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink></li>
+                        </>
+                      ) : (
+                        <>
+                          <li><NavLink to="/register" className="nav-link active">Sign up</NavLink></li>
+                          <li><NavLink to="/login" className="nav-link active">Sign in</NavLink></li>
+                        </>
+                      )}
                     </ul>
                   </li>
                 )}
@@ -98,11 +110,19 @@ function App() {
 
             {!isMobile && (
               <div className='right'>
-                <NavLink to="/login" className="nav-link active">Sign in</NavLink>
-                <NavLink to="/register" className="nav-link active">Sign up</NavLink>
+                {currentUser ? (
+                  <>
+                    {/* <NavLink to="/profile" className="nav-link active">Profile</NavLink> */}
+                    <NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink>
+                  </>
 
-                {/* <NavLink to="/profile" className="nav-link active">Profile</NavLink> */}
-                <NavLink to="/login" onClick={logout} className="nav-link active">Sign out</NavLink>
+                ) : (
+                  <>
+                    <NavLink to="/login" className="nav-link active">Sign in</NavLink>
+                    <NavLink to="/register" className="nav-link active">Sign up</NavLink>
+                  </>
+                )
+                }
               </div>
             )}
 
@@ -128,7 +148,7 @@ function App() {
       <footer className="App-footer">
         <p>&copy; 2025 AuthorFinder. All rights reserved.</p>
       </footer>
-    </div>
+    </div >
   )
 }
 
