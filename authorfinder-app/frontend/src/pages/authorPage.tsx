@@ -3,22 +3,23 @@ import type { Author } from "../model/Author";
 import { useParams } from "react-router";
 import authorAPI from "../services/author.service";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
-import type { Auth } from "../Auth/auth";
 import { FiHeart as Heart } from "react-icons/fi";
 import useIsMobile from "../hooks/useIsMobil";
 
 interface AuthorPageProps {
+  isFavoriteFromServer?: boolean;
   onAddFavorite?: (author: Author) => void;
 }
 
 function AuthorPage(props: AuthorPageProps) {
 
-  const { onAddFavorite } = props;
+  const { isFavoriteFromServer, onAddFavorite } = props;
 
   const [loading, setLoading] = useState(false);
   const [author, setAuthor] = useState<Author | null>(null);
   const [authorWorks, setAuthorWorks] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
   const params = useParams();
   const id = params.authorId;
 
@@ -37,6 +38,9 @@ function AuthorPage(props: AuthorPageProps) {
         setAuthorWorks(worksData);
         console.log("workAuthorData:", authorData);
 
+        if (isFavoriteFromServer !== undefined)
+          setIsFavorite(isFavoriteFromServer);
+
       } catch (e) {
         setError(e as string);
       } finally {
@@ -52,6 +56,7 @@ function AuthorPage(props: AuthorPageProps) {
     // console.log("Adding author to favorites:", author);
     event.preventDefault();
     setLoading(true);
+    setIsFavorite(isFavorite => !isFavorite);
     if (onAddFavorite) {
       onAddFavorite(author as Author);
     }
@@ -66,9 +71,9 @@ function AuthorPage(props: AuthorPageProps) {
           setAuthor(null);
           setAuthorWorks([]);
         }}
-        className="mb-6 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full transition duration-200 flex items-center gap-2"
+        className=""
       >
-        <span className="transform rotate-180 inline-block mr-1">→</span> Back to Search
+        <span className="">→</span> Back to Search
       </button> */}
 
       {author && (
@@ -94,16 +99,16 @@ function AuthorPage(props: AuthorPageProps) {
                           {!isMobil ? (
                             <button
                               onClick={handleAddFavoriteFromAPI}
-                              className="btn btn-outline-danger btn-md "
+                              className={isFavorite ? "btn btn-danger btn-md " : " btn btn-outline-danger btn-md "}
                               disabled={loading}
                             >
-                              {loading ? 'Adding...' : <><Heart size={20} /> Add to Favorites</>}
+                              {loading ? 'Adding...' : <><Heart size={20} /> {isFavorite ? <span> Remove from Favorites </span> : <span>Add to Favorites </span>} </>}
                             </button>
                           )
                             : (
                               <button
                                 onClick={handleAddFavoriteFromAPI}
-                                className="btn btn-outline-danger btn-sm "
+                                className={isFavorite ? "btn btn-danger btn-sm " : " btn btn-outline-danger btn-sm "}
                                 disabled={loading}
                               >
                                 {loading ? 'Adding...' : <><Heart size={20} /> </>}

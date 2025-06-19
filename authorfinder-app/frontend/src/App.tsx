@@ -10,6 +10,7 @@ import type { IAuth } from "./Auth/iauth";
 import { useEffect, useState } from "react";
 import { authServiceAPI } from "./services/auth.service";
 import AuthorPage from "./pages/authorPage";
+import HomePage from "./pages/homePage";
 
 function App() {
 
@@ -111,7 +112,7 @@ function App() {
 
       <div className='container'>
         <Routes>
-          <Route path="/" element={<h1>Welcome to Author Finder</h1>} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/index.html" element={<h1>Welcome to Author Finder</h1>} />
           <Route path="/authors" element={<AuthorsPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/authors/:authorId" element={<AuthorPage onAddFavorite={handleAddFavorite} />} />

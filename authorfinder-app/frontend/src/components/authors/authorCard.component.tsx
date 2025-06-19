@@ -6,11 +6,15 @@ import type { SyntheticEvent } from "react";
 
 interface AuthorCardProps {
   author: Author;
+  isFavorite?: boolean;
   onfavorite: (author: Author) => void;
 }
 
 function AuthorCard(props: AuthorCardProps) {
-  const { author, onfavorite }: AuthorCardProps = props;
+  const { author, isFavorite, onfavorite }: AuthorCardProps = props;
+
+
+
 
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
