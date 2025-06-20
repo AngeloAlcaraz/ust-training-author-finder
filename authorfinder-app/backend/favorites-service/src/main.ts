@@ -28,13 +28,15 @@ async function bootstrap() {
     .setTitle('Favorites Microservice')
     .setDescription('API to manage favorites for users')
     .setVersion('1.0')
-    .addTag('favorites')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3001);
+  await app.listen(process.env.PORT ?? 3001, '0.0.0.0', () => {
+    console.log(`🚀 Favorites service is running on port ${process.env.PORT ?? 3001}`);
+    console.log(`🧭 Swagger UI is available at http://localhost:${process.env.PORT ?? 3001}/api`);
+  });
 }
 
 bootstrap();

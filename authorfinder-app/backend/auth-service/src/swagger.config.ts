@@ -1,9 +1,11 @@
 import { INestApplication } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule, SwaggerCustomOptions } from "@nestjs/swagger";
+import { DocumentBuilder, SwaggerModule, SwaggerCustomOptions, OpenAPIObject } from "@nestjs/swagger";
+import axios from "axios";
 
-const documentConfig = new DocumentBuilder()
-    .setTitle("Author Finder Auth Service")
-    .setDescription("API documentation for the Author Finder authentication service")
+export const ConfigureSwaggerUI = async (app: INestApplication<any>) => {
+    const config = new DocumentBuilder()
+    .setTitle("Author Finder Service")
+    .setDescription("API documentation for the Full Author Finder Service")
     .setVersion("1.0")
     .addBearerAuth({
         type: "http",
@@ -22,16 +24,46 @@ const documentConfig = new DocumentBuilder()
     .addSecurityRequirements("Refresh-Token")
     .build();
 
-const swaggerUIOptions: SwaggerCustomOptions = {
-    swaggerOptions: {
-        persistAuthorization: true,
-    },
-    customSiteTitle: "Author Finder Auth Service API",
-    customJs: [],
-    customCssUrl: [],
-};
+    const swaggerUIOptions: SwaggerCustomOptions = {
+        swaggerOptions: { persistAuthorization: true, },
+        customSiteTitle: "Unified API Documentation",
+    };
 
-export const ConfigureSwaggerUI = async (app: INestApplication<any>) => {
-    const document = SwaggerModule.createDocument(app, documentConfig);
-    SwaggerModule.setup('api', app, document, swaggerUIOptions);
+    const authDocument = SwaggerModule.createDocument(app, config);
+    let favoritesDocument;
+    try {
+        favoritesDocument = await axios.get<OpenAPIObject>(`${process.env.FAVORITE_SERVICE_SWAGGER_URL}`);
+    } catch {
+        favoritesDocument = { data: { paths: {}, components: {}, tags: [] } };
+    }
+
+    const mergedDocument: OpenAPIObject = {
+        ...authDocument,
+        paths: {
+            ...authDocument.paths,
+            ...favoritesDocument.data.paths,
+        },
+        components: {
+            ...authDocument.components,
+            schemas: {
+                ...(authDocument.components?.schemas || {}),
+                ...(favoritesDocument.data.components?.schemas || {}),
+            },
+            securitySchemes: {
+                ...(authDocument.components?.securitySchemes || {}),
+                ...(favoritesDocument.data.components?.securitySchemes || {}),
+            },
+        },
+        tags: [
+            ...(authDocument.tags || []),
+            ...(favoritesDocument.data.tags || []),
+        ],
+    };
+
+    SwaggerModule.setup('api', app, mergedDocument, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+    customSiteTitle: 'Unified API Docs',
+  });
 }

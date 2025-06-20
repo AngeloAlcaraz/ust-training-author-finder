@@ -29,11 +29,11 @@ export class FavoritesQueueService {
   }
 
   // This method is used to enqueue a message for removing a favorite
-  async enqueueFavoriteRemoved(favoriteId: string, userId: string) {
+  async enqueueFavoriteRemoved(authorId: string, addedBy: string) {
     const message = {
       type: 'RemoveFavorite',
-      favoriteId,
-      userId,
+      authorId,
+      addedBy,
       timestamp: new Date().toISOString(),
     };
 
