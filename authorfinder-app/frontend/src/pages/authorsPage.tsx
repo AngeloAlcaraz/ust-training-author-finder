@@ -11,7 +11,7 @@ import { authServiceAPI } from "../services/auth.service";
 // import Pagination from "../components/share/pagination.component";
 
 interface AuthorsPageProps {
-  onAddFavorite: (author: Author) => void;
+  onAddFavorite: (author: Author, isFavorite: boolean) => void;
 }
 
 

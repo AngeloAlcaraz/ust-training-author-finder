@@ -1,21 +1,23 @@
 import { Link } from "react-router";
 import type { Author } from "../../model/Author";
-import type { SyntheticEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 
 interface AuthorLiProps {
   author: Author;
-  onfavorite: (author: Author) => void;
+  isFavorite?: boolean;
+  onfavorite: (author: Author, isFavorite: boolean) => void;
 }
 
 function AuthorLi(props: AuthorLiProps) {
 
-  const { author, onfavorite }: AuthorLiProps = props;
+  const { author, isFavorite: isFavoriteProp, onfavorite }: AuthorLiProps = props;
+  const [isFavorite, setIsFavorite] = useState(isFavoriteProp ?? false);
 
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
-    if (onfavorite) {
-      onfavorite(author);
-    }
+
+    setIsFavorite(!isFavorite)
+    onfavorite(author, isFavorite);
 
   }
 
@@ -37,7 +39,8 @@ function AuthorLi(props: AuthorLiProps) {
         <small>
           <button
             onClick={handleAddFavorite}
-            className="btn btn-outline-danger btn-md text-decoration-none">
+            className={isFavorite ? "btn btn-danger btn-md" : "btn btn-outline-danger btn-md"}>
+
             {/* <span className="bi bi-heart-fill"></span> */}
             <span className="bi bi-heart"></span>
 

@@ -4,12 +4,11 @@ import favoritesAPI from "../services/favorites.service";
 import type { Favorite } from "../model/Favorite";
 import AuthorCard from "../components/authors/authorCard.component";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
-import { isRouteErrorResponse } from "react-router";
 import type { Author } from "../model/Author";
 
 interface AuthorPageProps {
   isFavoriteFromServer?: boolean;
-  onAddFavorite: (author: Author) => void;
+  onAddFavorite: (author: Author, isFavorite: boolean) => void;
 }
 
 function Favorites(props: AuthorPageProps) {
@@ -52,16 +51,6 @@ function Favorites(props: AuthorPageProps) {
 
   }, []);
 
-  // function handleAddFavoriteFromAPI(event: SyntheticEvent): void {
-  //   // console.log("Adding author to favorites:", author);
-  //   event.preventDefault();
-  //   setLoading(true);
-  //   setIsFavorite(isFavorite => !isFavorite);
-  //   if (onAddFavorite) {
-  //     onAddFavorite(author as Author);
-  //   }
-  //   setLoading(false);
-  // }
 
   return (<>
 

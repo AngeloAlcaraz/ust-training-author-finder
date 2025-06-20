@@ -7,12 +7,11 @@ import { useState, type SyntheticEvent } from "react";
 interface AuthorCardProps {
   author: Author;
   isFavorite?: boolean;
-  onfavorite: (author: Author) => void;
+  onfavorite: (author: Author, isFavorite: boolean) => void;
 }
 
 function AuthorCard(props: AuthorCardProps) {
   const { author, isFavorite: isFavoriteProp, onfavorite }: AuthorCardProps = props;
-
   const [isFavorite, setIsFavorite] = useState(isFavoriteProp ?? false);
 
 
@@ -20,10 +19,9 @@ function AuthorCard(props: AuthorCardProps) {
 
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
+    
     setIsFavorite(!isFavorite)
-    if (onfavorite) {
-      onfavorite(author);
-    }
+    onfavorite(author, isFavorite);
 
   }
 

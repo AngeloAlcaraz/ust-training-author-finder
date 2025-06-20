@@ -56,8 +56,16 @@ function App() {
     setCurrentUser(null);
   }
 
-  function handleAddFavorite(author: any) {
-    console.log("Adding author to favorites:", author);
+  function handleAddFavorite(author: any, isFavorite: boolean) {
+
+
+    if (!isFavorite) {
+      console.log("SE AGREGA A FAVORITOS");
+      console.log(author);
+    }
+    else {
+      console.log("SE QUITA DE FAVORITOS");
+    }
     // Implement the logic to add the author to favorites
     // This could involve calling an API or updating local state
   }

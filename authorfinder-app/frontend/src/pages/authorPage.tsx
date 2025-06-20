@@ -9,7 +9,7 @@ import { authServiceAPI } from "../services/auth.service";
 
 interface AuthorPageProps {
   isFavoriteFromServer?: boolean;
-  onAddFavorite?: (author: Author) => void;
+  onAddFavorite?: (author: Author, isFavorite: boolean) => void;
 }
 
 function AuthorPage(props: AuthorPageProps) {
@@ -74,9 +74,9 @@ function AuthorPage(props: AuthorPageProps) {
     // console.log("Adding author to favorites:", author);
     event.preventDefault();
     setLoading(true);
-    setIsFavorite(isFavorite => !isFavorite);
+    setIsFavorite(!isFavorite);
     if (onAddFavorite) {
-      onAddFavorite(author as Author);
+      onAddFavorite(author as Author, isFavorite);
     }
     setLoading(false);
   }
