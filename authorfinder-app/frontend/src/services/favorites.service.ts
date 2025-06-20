@@ -38,17 +38,24 @@ const favoritesAPI = {
     if (favoritesData.success) {
       console.log(favoritesData.message);
       const response = convertToFavoriteModels(favoritesData.data);
-      console.log("RESPUESTA DESDE ELSERVICIO:" + response);
       return response;
     }
 
     return undefined;
   },
-  async addFavoriteToUser(favorite: Favorite | undefined): Promise<any[]> {
-    // Fetch author's works
-    const response = await fetch(`${baseUrl}favorites`, {
+  async addFavoriteToUser(favorite: Favorite | undefined): Promise<any> {
+    const response = await fetch(`${baseUrl}`, {
       method: "post",
-      body: JSON.stringify(favorite),
+      body: JSON.stringify({
+        authorId: favorite?.authorId,
+        name: favorite?.name,
+        imageUrl: favorite?.imageUrl,
+        birthDate: "1800-01-01",
+        deathDate: favorite?.deathDate,
+        topWork: favorite?.topWork,
+        addedBy: favorite?.addedBy,
+        addedAt: "2025-06-15T12:34:56.000Z",
+      }),
       headers: {
         "Content-Type": "application/json",
         Authorization: authHeader(),
@@ -61,20 +68,38 @@ const favoritesAPI = {
       );
     }
     const data = await response.json();
-    console.log("Works Data:", data);
 
-    return data || [];
+    console.log(data.message);
+    const responseConverted = convertToFavoriteModels(data.data);
+    console.log("RESPUESTA DESDE ELSERVICIO:" + responseConverted);
+
+    return responseConverted;
   },
-  // async getAuthorsByName(name: string): Promise<Author[]> {
-  //   const response = await fetch(`${searchUrl}${name}`);
-  //   if (!response.ok) {
-  //     throw new Error(`HTTP error! status: ${response.status}`);
-  //   }
-  //   const data = await response.json();
-  //   console.log("Search Results:", data.docs);
+  async deleteFavoriteToUser(addedBy: string, authorId: string): Promise<any> {
+    const response = await fetch(`${baseUrl}${addedBy}/${authorId}`, {
+      method: "delete",
+      // body: JSON.stringify({
+      //   addedBy: userId,
+      //   authorId: authorId,
+      // }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader(),
+      },
+    });
 
-  //   return data.docs;
-  // },
+    if (!response.ok) {
+      throw new Error(
+        `Failed to delete favorite for user ${addedBy}: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log(data.message);
+    }
+  },
 };
 
 export default favoritesAPI;

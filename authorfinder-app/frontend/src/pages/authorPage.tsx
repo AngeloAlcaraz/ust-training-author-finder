@@ -52,7 +52,7 @@ function AuthorPage(props: AuthorPageProps) {
         if (isFavoriteFromServer !== undefined)
           setIsFavorite(isFavoriteFromServer);
         else if (isFavoriteFromCard !== undefined) {
-          console.log("Se paso un Estado: " + isFavoriteFromCard)
+
           setIsFavorite(isFavoriteFromCard);
         }
 
@@ -63,7 +63,6 @@ function AuthorPage(props: AuthorPageProps) {
       } finally {
         setLoading(false);
       }
-      console.log("Salio del request");
     };
 
     if (user) {

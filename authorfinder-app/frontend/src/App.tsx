@@ -12,6 +12,10 @@ import { authServiceAPI } from "./services/auth.service";
 import AuthorPage from "./pages/authorPage";
 import HomePage from "./pages/homePage";
 import Favorites from "./pages/favoritesPage";
+import favoritesAPI from "./services/favorites.service";
+import type { Auth } from "./Auth/auth";
+import type { Author } from "./model/Author";
+import { Favorite } from "./model/Favorite";
 
 function App() {
 
@@ -56,18 +60,40 @@ function App() {
     setCurrentUser(null);
   }
 
-  function handleAddFavorite(author: any, isFavorite: boolean) {
-
-
+  async function handleAddFavorite(author: Author, isFavorite: boolean) {
     if (!isFavorite) {
       console.log("SE AGREGA A FAVORITOS");
       console.log(author);
+      console.log(currentUser?.data.email)
+
+      const favorite = new Favorite({});
+
+      favorite.authorId = author.key;
+      favorite.name = author.name;
+      favorite.imageUrl = `https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`;
+      favorite.deathDate = author.death_date;
+      favorite.topWork = author.top_work ?? " ";
+      favorite.addedBy = currentUser?.data.email ?? "";
+
+
+
+      try {
+        await favoritesAPI.addFavoriteToUser(favorite);
+      }
+      catch (e) {
+
+      }
     }
     else {
-      console.log("SE QUITA DE FAVORITOS");
+      if (currentUser?.data?.email) {
+        const authorKey = author.key.split('/');
+        favoritesAPI.deleteFavoriteToUser(currentUser.data.email, authorKey[0]);
+        // favoritesAPI.deleteFavoriteToUser("luis3%40ust.com", authorKey[0]);
+
+      } else {
+        console.error("User id is undefined, cannot remove favorite.");
+      }
     }
-    // Implement the logic to add the author to favorites
-    // This could involve calling an API or updating local state
   }
 
 

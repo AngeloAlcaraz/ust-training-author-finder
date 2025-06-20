@@ -27,7 +27,7 @@ function Favorites(props: AuthorPageProps) {
     const fetchFavorites = async () => {
       try {
         console.log("USUARIO:" + user.data.userId);
-        const response = await favoritesAPI.getFavoritesByUser("user_123")
+        const response = await favoritesAPI.getFavoritesByUser(user.data.userId)
         setFavorites(response);
       }
       catch (e) {
