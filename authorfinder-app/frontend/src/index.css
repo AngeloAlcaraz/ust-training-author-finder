@@ -23,7 +23,9 @@ body,
 }
 
 
-
+a.button.active {
+  border: 1px solid var(--fore-color);
+}
 
 .login-container {
   display: flex;

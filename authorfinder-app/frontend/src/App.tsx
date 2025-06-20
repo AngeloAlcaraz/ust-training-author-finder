@@ -137,7 +137,7 @@ function App() {
           <Route path="/index.html" element={<HomePage />} />
           <Route path="/authors" element={<AuthorsPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/authors/:authorId" element={<AuthorPage onAddFavorite={handleAddFavorite} />} />
-          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/favorites" element={<Favorites isFavoriteFromServer={true} onAddFavorite={handleAddFavorite} />} />
           <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           {/* <Route path="/profile" element={<h1>User Profile</h1>} /> */}

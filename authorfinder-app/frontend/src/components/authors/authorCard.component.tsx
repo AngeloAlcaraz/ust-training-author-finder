@@ -21,9 +21,9 @@ function AuthorCard(props: AuthorCardProps) {
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
     setIsFavorite(!isFavorite)
-    // if (onfavorite) {
-    //   onfavorite(author);
-    // }
+    if (onfavorite) {
+      onfavorite(author);
+    }
 
   }
 
