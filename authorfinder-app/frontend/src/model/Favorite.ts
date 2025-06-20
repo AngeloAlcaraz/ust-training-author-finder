@@ -1,4 +1,7 @@
+import type { Author } from "./Author";
+
 export class Favorite {
+  author: Author;
   authorId: string;
   name: string;
   imageUrl: string;
@@ -17,5 +20,14 @@ export class Favorite {
     this.topWork = initializer.topWork ?? "";
     this.addedBy = initializer.addedBy ?? "";
     this.addedAt = initializer.addedAt ?? "";
+
+    this.author = {
+      key: this.authorId,
+      name: this.name,
+      top_work: this.topWork,
+      birth_date: this.birthDate,
+      death_date: this.deathDate,
+      bio: "",
+    };
   }
 }

@@ -3,7 +3,7 @@ import type { IAuth } from "../Auth/iauth";
 import { LoginErroMessage } from "../Auth/loginErrorMessage";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const API_URL = "http://localhost:4000/auth";
+const API_URL = "http://localhost:4000/api/v1/auth";
 
 function translateStatusToErrorMessage(status: number) {
   switch (status) {
@@ -78,7 +78,7 @@ const authServiceAPI = {
     //Todo: Call to backend service to delete the token
     localStorage.removeItem("user");
   },
-  register(name: string, email: string, password: string,gender:"male") {
+  register(name: string, email: string, password: string, gender: "male") {
     return fetch(`${API_URL}/signup`, {
       method: "post",
       body: JSON.stringify({

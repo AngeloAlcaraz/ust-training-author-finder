@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import type { Author } from "../../model/Author";
 import { FiHeart as Heart } from "react-icons/fi";
-import type { SyntheticEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 
 
 interface AuthorCardProps {
@@ -11,16 +11,19 @@ interface AuthorCardProps {
 }
 
 function AuthorCard(props: AuthorCardProps) {
-  const { author, onfavorite }: AuthorCardProps = props;
+  const { author, isFavorite: isFavoriteProp, onfavorite }: AuthorCardProps = props;
+
+  const [isFavorite, setIsFavorite] = useState(isFavoriteProp ?? false);
 
 
 
 
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
-    if (onfavorite) {
-      onfavorite(author);
-    }
+    setIsFavorite(!isFavorite)
+    // if (onfavorite) {
+    //   onfavorite(author);
+    // }
 
   }
 
@@ -44,10 +47,10 @@ function AuthorCard(props: AuthorCardProps) {
           </Link>
           <small>
             <button
-              className="btn btn-outline-danger btn-md text-decoration-none"
+              className={isFavorite ? "btn btn-danger btn-md" : "btn btn-outline-danger btn-md"}
               onClick={handleAddFavorite}>
               {/* <span className="bi bi-heart-fill"></span> */}
-              <span className=""><Heart size={20} /></span>
+              <span ><Heart size={20} /></span>
 
             </button>
           </small>
