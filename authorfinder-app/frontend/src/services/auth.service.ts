@@ -5,6 +5,7 @@ import { LoginErroMessage } from "../Auth/loginErrorMessage";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const API_URL = "http://localhost:4000/api/v1/auth";
 
+//const API_URL = "http://13.221.227.133:4000/api/v1/auth";
 function translateStatusToErrorMessage(status: number) {
   switch (status) {
     case 401:

@@ -1,6 +1,6 @@
 import { useEffect, useState, type SyntheticEvent } from "react";
 import type { Author } from "../model/Author";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import authorAPI from "../services/author.service";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
 import { FiHeart as Heart } from "react-icons/fi";
@@ -15,6 +15,7 @@ interface AuthorPageProps {
 
 function AuthorPage(props: AuthorPageProps) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { isFavoriteFromServer, onAddFavorite } = props;
   const { isFavoriteFromCard } = location.state || {};
@@ -58,6 +59,7 @@ function AuthorPage(props: AuthorPageProps) {
 
       } catch (e) {
         // setError(e as string);
+        navigate("/notfound");
       } finally {
         setLoading(false);
       }
@@ -71,11 +73,6 @@ function AuthorPage(props: AuthorPageProps) {
     else {
       console.log('No user found.');
     }
-
-
-
-
-
   }, [id]);
 
   function handleAddFavoriteFromAPI(event: SyntheticEvent): void {
