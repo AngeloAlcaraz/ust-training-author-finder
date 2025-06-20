@@ -12,14 +12,17 @@ async function bootstrap() {
     { abortOnError: false } // Prevent Nest from crashing on unhandled exceptions, delete this line if you want the default behavior
   );
 
+  app.setGlobalPrefix('api/v1'); 
+
   app.enableCors({
     origin: CORS_ORIGIN,
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-  ConfigureSwaggerUI(app);
-  await app.listen(PORT, () => {
+  await ConfigureSwaggerUI(app);
+  await app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Auth service is running on port ${PORT}`);
+    console.log(`🧭 Swagger UI is available at http://localhost:${PORT}/api`);
   });
 }
 bootstrap();
