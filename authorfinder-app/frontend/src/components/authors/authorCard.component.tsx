@@ -19,7 +19,7 @@ function AuthorCard(props: AuthorCardProps) {
 
   function handleAddFavorite(event: SyntheticEvent): void {
     event.preventDefault();
-    
+
     setIsFavorite(!isFavorite)
     onfavorite(author, isFavorite);
 
@@ -31,7 +31,11 @@ function AuthorCard(props: AuthorCardProps) {
 
       <div className="card-body">
         <div className="d-flex w-100 justify-content-between">
-          <Link to={"/authors/" + author.key} className="text-decoration-none text-dark">
+          <Link
+            to={"/authors/" + author.key}
+            className="text-decoration-none text-dark"
+            state={{ isFavoriteFromCard: isFavorite }}
+          >
             <div className="d-flex align-items-center gap-3">
               <img
                 src={`https://covers.openlibrary.org/a/olid/${author.key}-M.jpg`}

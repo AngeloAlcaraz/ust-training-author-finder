@@ -6,6 +6,7 @@ import LoadingSpinner from "../components/share/loadingSpinner.component";
 import { FiHeart as Heart } from "react-icons/fi";
 import useIsMobile from "../hooks/useIsMobil";
 import { authServiceAPI } from "../services/auth.service";
+import { useLocation } from 'react-router-dom';
 
 interface AuthorPageProps {
   isFavoriteFromServer?: boolean;
@@ -13,11 +14,13 @@ interface AuthorPageProps {
 }
 
 function AuthorPage(props: AuthorPageProps) {
+  const location = useLocation();
 
   const { isFavoriteFromServer, onAddFavorite } = props;
+  const { isFavoriteFromCard } = location.state || {};
+
 
   const [isLogin, setIsLogin] = useState(false)
-
   const [loading, setLoading] = useState(false);
   const [author, setAuthor] = useState<Author | null>(null);
   const [authorWorks, setAuthorWorks] = useState<any[]>([]);
@@ -47,6 +50,11 @@ function AuthorPage(props: AuthorPageProps) {
 
         if (isFavoriteFromServer !== undefined)
           setIsFavorite(isFavoriteFromServer);
+        else if (isFavoriteFromCard !== undefined) {
+          console.log("Se paso un Estado: " + isFavoriteFromCard)
+          setIsFavorite(isFavoriteFromCard);
+        }
+
 
       } catch (e) {
         // setError(e as string);
