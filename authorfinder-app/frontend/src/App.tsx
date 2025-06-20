@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { authServiceAPI } from "./services/auth.service";
 import AuthorPage from "./pages/authorPage";
 import HomePage from "./pages/homePage";
+import Favorites from "./pages/favoritesPage";
 
 function App() {
 
@@ -28,7 +29,7 @@ function App() {
       setCurrentUser(user);
     }
     else {
-      console.log('No user found in local storage.');
+      console.log('No user found.');
     }
   }, []);
 
@@ -136,7 +137,7 @@ function App() {
           <Route path="/index.html" element={<HomePage />} />
           <Route path="/authors" element={<AuthorsPage onAddFavorite={handleAddFavorite} />} />
           <Route path="/authors/:authorId" element={<AuthorPage onAddFavorite={handleAddFavorite} />} />
-          <Route path="/favorites" element={<h1>My Favorites</h1>} />
+          <Route path="/favorites" element={<Favorites />} />
           <Route path="/register" element={<RegisterPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           <Route path="/login" element={<LoginPage onLoginError={handleLoginError} onLoginSuccess={handleLoginSuccess} />} />
           {/* <Route path="/profile" element={<h1>User Profile</h1>} /> */}

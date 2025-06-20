@@ -11,7 +11,7 @@ interface AuthorCardProps {
 }
 
 function AuthorCard(props: AuthorCardProps) {
-  const { author, isFavorite, onfavorite }: AuthorCardProps = props;
+  const { author, onfavorite }: AuthorCardProps = props;
 
 
 

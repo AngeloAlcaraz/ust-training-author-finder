@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import type { Author } from "../../model/Author";
+import type { SyntheticEvent } from "react";
 
 interface AuthorLiProps {
   author: Author;
@@ -9,6 +10,14 @@ interface AuthorLiProps {
 function AuthorLi(props: AuthorLiProps) {
 
   const { author, onfavorite }: AuthorLiProps = props;
+
+  function handleAddFavorite(event: SyntheticEvent): void {
+    event.preventDefault();
+    if (onfavorite) {
+      onfavorite(author);
+    }
+
+  }
 
   return (
     <>
@@ -26,7 +35,9 @@ function AuthorLi(props: AuthorLiProps) {
           </div>
         </Link>
         <small>
-          <button className="btn btn-outline-danger btn-md text-decoration-none">
+          <button
+            onClick={handleAddFavorite}
+            className="btn btn-outline-danger btn-md text-decoration-none">
             {/* <span className="bi bi-heart-fill"></span> */}
             <span className="bi bi-heart"></span>
 

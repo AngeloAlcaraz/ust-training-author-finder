@@ -1,4 +1,4 @@
-import { useRef, useState, type SyntheticEvent } from "react";
+import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { Search } from 'lucide-react';
 import MessageBox from "../components/share/message.component";
 import LoadingSpinner from "../components/share/loadingSpinner.component";
@@ -7,6 +7,7 @@ import AuthorLi from "../components/authors/authorLi.component";
 import AuthorCard from "../components/authors/authorCard.component";
 import authorAPI from "../services/author.service";
 import useIsMobile from "../hooks/useIsMobil";
+import { authServiceAPI } from "../services/auth.service";
 // import Pagination from "../components/share/pagination.component";
 
 interface AuthorsPageProps {
@@ -30,12 +31,24 @@ function AuthorsPage(props: AuthorsPageProps) {
   const messageBoxTimeoutRef = useRef(null);
   const confirmPromiseResolve = useRef<((confirmed: boolean) => void) | null>(null); // To handle message box confirmations
 
-
+  const [isLogin, setIsLogin] = useState(false)
   const [loading, setLoading] = useState(false);
   // const [error, setError] = useState<string | undefined>(undefined);
 
   const [searchText, setSearchText] = useState('');
   // const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    console.log('Validating credentials...');
+    const user = authServiceAPI.getCurrentUser();
+
+    if (user) {
+      setIsLogin(true);
+    }
+    else {
+      console.log('No user found.');
+    }
+  }, []);
 
   const handleSearch = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -100,95 +113,111 @@ function AuthorsPage(props: AuthorsPageProps) {
 
   return (
     <>
-      <div className="col-12 mb-2">
-        <h2 className="mb-6 text-center">
-          Explore Authors
-        </h2>
-      </div>
-
-      <div className=" text-center">
-        <div className="row container justify-content-center">
-          <div className="col-8">
-            <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-8">
-              <div className="input-group mb-3">
-
-                <input
-                  type="text"
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  placeholder="Search author by name (e.g., 'Jane Austen')"
-                  className="form-control"
-                />
-
-                <button
-                  type="submit"
-                  className="btn btn-outline-primary btn-sm"
-                  disabled={loading}
-                >
-                  {loading ? 'Searching...' : <><Search size={20} /> Search</>}
-                </button>
-              </div>
-            </form>
+      {isLogin ? (
+        <>
+          <div className="col-12 mb-2">
+            <h2 className="mb-6 text-center">
+              Explore Authors
+            </h2>
           </div>
-        </div>
-      </div>
 
-      {showMessageBox && (
-        <MessageBox
-          message={message}
-          type={messageType}
-          onMessageBoxAction={() => handleMessageBoxAction} // Allow closing info/error/success boxes
-        />
-      )}
+          <div className=" text-center">
+            <div className="row container justify-content-center">
+              <div className="col-8">
+                <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-8">
+                  <div className="input-group mb-3">
 
-      {searchResults.length > 0 && (
-        <div className="shadow-lg rounded-lg p-4 bg-white">
-          <h3 className="text-2xl font-bold text-gray-700 mb-4">Search Results</h3>
+                    <input
+                      type="text"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      placeholder="Search author by name (e.g., 'Jane Austen')"
+                      className="form-control"
+                    />
 
-          {isMobile && (<>
+                    <button
+                      type="submit"
+                      className="btn btn-outline-primary btn-sm"
+                      disabled={loading}
+                    >
+                      {loading ? 'Searching...' : <><Search size={20} /> Search</>}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
 
-            <ul className="list-group list-group-flush">
-              {searchResults.map((author) => (
-                <li key={author.key} className="list-group-item">
-                  <AuthorLi author={author} onfavorite={onAddFavorite}></AuthorLi>
-                </li>
+          {showMessageBox && (
+            <MessageBox
+              message={message}
+              type={messageType}
+              onMessageBoxAction={() => handleMessageBoxAction} // Allow closing info/error/success boxes
+            />
+          )}
 
-              ))}
-            </ul>
-            {/* <Pagination
+          {searchResults.length > 0 && (
+            <div className="shadow-lg rounded-lg p-4 bg-white">
+              <h3 className="text-2xl font-bold text-gray-700 mb-4">Search Results</h3>
+
+              {isMobile && (<>
+
+                <ul className="list-group list-group-flush">
+                  {searchResults.map((author) => (
+                    <li key={author.key} className="list-group-item">
+                      <AuthorLi author={author} onfavorite={onAddFavorite}></AuthorLi>
+                    </li>
+
+                  ))}
+                </ul>
+                {/* <Pagination
               currentPage={allAuthorsPage}
               totalPages={totalAllAuthorsPages}
               onPageChange={setAllAuthorsPage}
             /> */}
-          </>
+              </>
 
-          )}
+              )}
 
-          {!isMobile && (
-            <>
-              <ul className="list-group list-group-flush">
-                <div className="row row-cols-1 row-cols-md-3 g-4 ">
-                  {searchResults.map((author) => (
-                    <div className="col" key={author.key}>
-                      <AuthorCard author={author} onfavorite={onAddFavorite}></AuthorCard>
+              {!isMobile && (
+                <>
+                  <ul className="list-group list-group-flush">
+                    <div className="row row-cols-1 row-cols-md-3 g-4 ">
+                      {searchResults.map((author) => (
+                        <div className="col" key={author.key}>
+                          <AuthorCard author={author} onfavorite={onAddFavorite}></AuthorCard>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </ul>
-              {/* <Pagination
+                  </ul>
+                  {/* <Pagination
                 currentPage={allAuthorsPage}
                 totalPages={totalAllAuthorsPages}
                 onPageChange={setAllAuthorsPage}
               /> */}
 
-            </>
+                </>
 
+              )}
+            </div>
           )}
-        </div>
-      )}
 
 
-      {loading && <LoadingSpinner />}
+          {loading && <LoadingSpinner />}
+        </>
+      ) : (
+        <>
+          <div className="alert alert-warning d-flex align-items-center" role="alert">
+
+            <div>
+              <h3>Unauthorize: Please Sing in</h3 >
+            </div>
+          </div>
+
+        </>
+      )
+      }
+
     </>
   );
 }
