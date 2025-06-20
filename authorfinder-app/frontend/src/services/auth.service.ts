@@ -78,7 +78,7 @@ const authServiceAPI = {
     //Todo: Call to backend service to delete the token
     localStorage.removeItem("user");
   },
-  register(name: string, email: string, password: string, gender: "male") {
+  register(name: string, email: string, password: string,gender:"male") {
     return fetch(`${API_URL}/signup`, {
       method: "post",
       body: JSON.stringify({
