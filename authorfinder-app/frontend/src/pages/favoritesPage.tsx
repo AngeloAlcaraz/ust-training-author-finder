@@ -1,4 +1,4 @@
-import { useEffect, useState, type SyntheticEvent } from "react";
+import { useEffect, useState } from "react";
 import { authServiceAPI } from "../services/auth.service";
 import favoritesAPI from "../services/favorites.service";
 import type { Favorite } from "../model/Favorite";

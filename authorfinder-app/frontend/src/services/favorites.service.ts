@@ -1,7 +1,9 @@
 import { Favorite } from "../model/Favorite";
 import authHeader from "./auth-header";
 
-const baseUrl = "http://localhost:4000/api/v1/favorites/";
+const baseUrl = "http://13.221.227.133:4000/api/v1/favorites/";
+
+//const baseUrl = "http://localhost:4000/api/v1/favorites/";
 // const authorsUrl = `${baseUrl}authors/`;
 // const searchUrl = `${baseUrl}search/authors.json?q=`;
 

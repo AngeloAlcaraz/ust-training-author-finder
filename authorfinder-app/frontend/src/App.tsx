@@ -13,7 +13,6 @@ import AuthorPage from "./pages/authorPage";
 import HomePage from "./pages/homePage";
 import Favorites from "./pages/favoritesPage";
 import favoritesAPI from "./services/favorites.service";
-import type { Auth } from "./Auth/auth";
 import type { Author } from "./model/Author";
 import { Favorite } from "./model/Favorite";
 
